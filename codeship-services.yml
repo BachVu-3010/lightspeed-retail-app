@@ -1,0 +1,21 @@
+app:
+  build:
+    image: app
+    path: .
+    dockerfile_path: docker/Dockerfile
+
+app-staging:
+  build:
+    image: app
+    path: .
+    dockerfile_path: docker/Dockerfile
+  encrypted_env_file:
+    - docker/staging.env.encrypted
+
+app-prod:
+  build:
+    image: app
+    path: .
+    dockerfile_path: docker/Dockerfile
+  encrypted_env_file:
+    - docker/prod.env.encrypted
