@@ -1,9 +1,9 @@
 import getProperties from './src/getProperties';
 
 export default {
-  name: 'AppName',
-  description: 'Description for AppName',
-  callToAction: 'Create AppName',
+  name: 'Lightspeed Retail',
+  description: 'Description for Lightspeed Retail',
+  callToAction: 'Create Lightspeed Retail',
   properties: getProperties(),
   simulator: {
     presentations: [{ name: 'New Presentation' }],

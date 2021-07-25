@@ -3,10 +3,10 @@ import { mount } from 'enzyme';
 import { spy, useFakeTimers } from 'sinon';
 import fetchMock from 'fetch-mock';
 
-import { AppName } from './AppName';
+import { LightSpeedRetail } from './LightSpeedRetail';
 import '../setupTest';
 
-describe('AppName', () => {
+describe('LightSpeedRetail', () => {
   beforeEach(() => {
     fetchMock.mock();
   });
@@ -17,7 +17,7 @@ describe('AppName', () => {
 
   it('should render app with correct values', () => {
     const onReady = spy();
-    const wrapper = mount(<AppName presentation={{ values: { duration: 120 } }} onReady={onReady} />);
+    const wrapper = mount(<LightSpeedRetail presentation={{ values: { duration: 120 } }} onReady={onReady} />);
 
     wrapper.find('main').find('h1').text().should.equal('RaydiantKit');
     wrapper.find('main').find('h2').text().should.equal('Screen signage SDK');
@@ -29,7 +29,7 @@ describe('AppName', () => {
     const onReady = spy();
     const onComplete = spy();
     const wrapper = mount(
-      <AppName
+      <LightSpeedRetail
         presentation={{
           values: {
             duration: 40,

@@ -1,39 +1,9 @@
-# Getting started
+[![Codeship Status for mirainc/lightspeed-retail](https://app.codeship.com/projects/27cee078-5f44-4ae5-be97-4ef601c2c608/status?branch=staging)](https://app.codeship.com/projects/27cee078-5f44-4ae5-be97-4ef601c2c608)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/c8379e2c-a22f-4516-b9ea-354d0eb5380e/deploy-status)](https://app.netlify.com/sites/raydiant-lightspeed-retail-app/deploys)
 
-**Important**: Remove the whole section **Getting started** after finishing update the template
+# lightspeed-retail
 
-## What's this?
-
-This project is a template for raydiant applications integrated with Netlify and CodeShip
-
-## How to use?
-
-1. Create a project from this template, guidance [here](https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/creating-a-repository-from-a-template)
-
-2. Create CodeShip project and Netlify project for the new repository
-
-3. Replace these values in the new repo's source code:
-
-   - `appname` with the project's lowercase app name. E.g. `screenfeed`
-   - `AppName` with the project's capitalized app name. E.g. `Screenfeed`
-   - `<appname-CodeShipProjectId>` with CodeShip's project ID
-
-4. Create encrypted environment files by:
-
-   - Rename `docker/staging.sample.env` to `docker/staging.env`
-   - Rename `docker/prod.sample.env` to `docker/prod.env`
-   - Fill the values in the above files.
-     - For `RAYDIANT_APP_ID`, generate application IDs for staging app and production app by [this tool](https://www.uuidgenerator.net/version4)
-   - Create file `mirainc_<appname>.aes` with aes key from CodeShip settings
-   - Run `yarn encryptenv`
-
----
-
-[![Codeship Status for mirainc/appname](https://app.codeship.com/projects/<appname-CodeShipProjectId>/status?branch=staging)](https://app.codeship.com/projects/<appname-CodeShipProjectId>)
-
-# appname
-
-Description for appname
+Description for lightspeed-retail
 
 ---
 
@@ -62,7 +32,7 @@ Description for appname
   - [Start local project with staging settings](#start-with-staging-settings)
     - Using staging backend
 
-1. Download the `mirainc_appname.aes` key from [CodeShip](https://app.codeship.com/projects/<appname-CodeShipProjectId>) and copy it to the root directory of this repository.
+1. Download the `mirainc_lightspeed-retail.aes` key from [the CodeShip project](https://app.codeship.com/projects/27cee078-5f44-4ae5-be97-4ef601c2c608/configure) and copy it to the root directory of this repository.
 
 2. <a name='decrypt-env-vars'></a>Decode the environment files
 
