@@ -1,5 +1,5 @@
 [![Codeship Status for mirainc/lightspeed-retail](https://app.codeship.com/projects/27cee078-5f44-4ae5-be97-4ef601c2c608/status?branch=staging)](https://app.codeship.com/projects/27cee078-5f44-4ae5-be97-4ef601c2c608)
-[![Netlify Status](https://api.netlify.com/api/v1/badges/c8379e2c-a22f-4516-b9ea-354d0eb5380e/deploy-status)](https://app.netlify.com/sites/raydiant-lightspeed-retail-app/deploys)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/8bc026ad-2600-4566-b812-d490266e896d/deploy-status)](https://app.netlify.com/sites/raydiant-lightspeed-retail-app/deploys)
 
 # lightspeed-retail
 
