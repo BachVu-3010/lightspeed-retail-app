@@ -1,5 +1,5 @@
-import AppName from './components/AppName';
+import LightSpeedRetail from './components/LightSpeedRetail';
 import getProperties from './getProperties';
 
-export default AppName;
+export default LightSpeedRetail;
 export { getProperties };

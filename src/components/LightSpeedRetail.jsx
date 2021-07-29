@@ -5,7 +5,7 @@ import { withRaydiantApp } from 'raydiant-kit';
 import logger from '../utils/logger';
 import './styles.css';
 
-export const AppName = ({ presentation: { values }, device, isPlaying, onReady, onComplete, onError }) => {
+export const LightSpeedRetail = ({ presentation: { values }, device, isPlaying, onReady, onComplete, onError }) => {
   const { duration } = values;
 
   // Set logger's context with current device
@@ -46,7 +46,7 @@ export const AppName = ({ presentation: { values }, device, isPlaying, onReady, 
   );
 };
 
-AppName.propTypes = {
+LightSpeedRetail.propTypes = {
   presentation: PropTypes.shape({
     values: PropTypes.shape({
       duration: PropTypes.number,
@@ -59,11 +59,11 @@ AppName.propTypes = {
   onError: PropTypes.func.isRequired,
 };
 
-AppName.defaultProps = {
+LightSpeedRetail.defaultProps = {
   isPlaying: false,
   onReady: () => {},
   onComplete: () => {},
   onError: () => {},
 };
 
-export default withRaydiantApp(AppName);
+export default withRaydiantApp(LightSpeedRetail);

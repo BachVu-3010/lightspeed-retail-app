@@ -1,5 +1,5 @@
 {
-  "name": "appname",
+  "name": "lightspeed-retail",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -46,6 +46,10 @@
     "sinon": "^9.0.3"
   },
   "resolutions": {
+    "react": "16.8.0",
+    "react-dom": "16.8.0",
+    "@babel/runtime": "7.8.7",
+    "raydiant-simulator": "4.5.2",
     "node-fetch": "2.1.2"
   },
   "lint-staged": {
