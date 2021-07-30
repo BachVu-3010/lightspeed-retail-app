@@ -1,6 +1,6 @@
 {
   "name": "lightspeed-retail",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
     "prop-types": "^15.7.2",
@@ -9,7 +9,7 @@
     "react-dom": "^16.8.0"
   },
   "scripts": {
-    "start": "RAYDIANT_APP_ENVIRONMENT=local RAYDIANT_APP_LOG_LEVEL=DEBUG raydiant-scripts start",
+    "start": "RAYDIANT_APP_ENVIRONMENT=local RAYDIANT_APP_LOG_LEVEL=DEBUG RAYDIANT_APP_LS_RETAIL_BASE_URL=http://localhost:3000 raydiant-scripts start",
     "start:staging": "export $(grep -v '^#' ./docker/staging.env | xargs) && raydiant-scripts start",
     "build": "raydiant-scripts build",
     "deploy:staging": "tasks/deploy-staging.bash",

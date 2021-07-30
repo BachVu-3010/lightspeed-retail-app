@@ -9,9 +9,10 @@ Description for lightspeed-retail
 
 ## Properties
 
-| Name       | Type     | Description                    |
-| ---------- | -------- | ------------------------------ |
-| `duration` | `number` | Manual display time in seconds |
+| Name       | Type     | Description                                                            |
+| ---------- | -------- | ---------------------------------------------------------------------- |
+| `authKey`  | `oAuth`  | An auth key returned from lightspeed-retail-backend's /redeem endpoint |
+| `duration` | `number` | Manual display time in seconds                                         |
 
 ---
 

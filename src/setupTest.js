@@ -31,3 +31,5 @@ afterEach(() => {
   matchMediaAddListenerStub.resetHistory();
   matchMediaRemoveListenerStub.resetHistory();
 });
+
+process.env.RAYDIANT_APP_LS_RETAIL_BASE_URL = 'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL';
