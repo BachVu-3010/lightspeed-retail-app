@@ -2,6 +2,7 @@
 set -e
 
 export RAYDIANT_APP_LOG_LEVEL=INFO
+export RAYDIANT_APP_LS_RETAIL_BASE_URL=https://ls-retail-backend.staging.raydiant.com
 
 # build with urls
 RAYDIANT_APP_REVISION=$CI_COMMIT_ID raydiant-scripts build
