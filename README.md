@@ -9,10 +9,11 @@ Description for lightspeed-retail
 
 ## Properties
 
-| Name       | Type     | Description                                                            |
-| ---------- | -------- | ---------------------------------------------------------------------- |
-| `authKey`  | `oAuth`  | An auth key returned from lightspeed-retail-backend's /redeem endpoint |
-| `duration` | `number` | Manual display time in seconds                                         |
+| Name         | Type        | Description                                                            |
+| ------------ | ----------- | ---------------------------------------------------------------------- |
+| `authKey`    | `oAuth`     | An auth key returned from lightspeed-retail-backend's /redeem endpoint |
+| `locationId` | `selection` | Selected LightSpeed bussines location's ID                             |
+| `duration`   | `number`    | Manual display time in seconds                                         |
 
 ---
 

@@ -27,6 +27,26 @@ describe('getProperties', () => {
     });
   });
 
+  describe('locationId', () => {
+    it('should have correct attributes', () => {
+      const properties = toPlainObject(getProperties({ presentation: { values: {} } }));
+      properties.locationId.should.eql({
+        label: 'select a business location',
+        type: 'selection',
+        optional: true,
+        constraints: {},
+        options: [],
+        optionsUrl: 'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/locationOptions?auth_key={{authKey}}',
+        hide: true,
+      });
+    });
+
+    it('should be shown after ls is connected', () => {
+      const properties = toPlainObject(getProperties({ presentation: { values: { authKey: 'auth-key' } } }));
+      properties.locationId.hide.should.be.false();
+    });
+  });
+
   describe('duration', () => {
     it('should have correct attributes', () => {
       const properties = toPlainObject(getProperties({ presentation: { values: {} } }));

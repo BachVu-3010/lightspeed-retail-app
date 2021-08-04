@@ -1,6 +1,6 @@
 {
   "name": "lightspeed-retail",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "private": true,
   "dependencies": {
     "prop-types": "^15.7.2",
