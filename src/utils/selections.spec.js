@@ -100,6 +100,21 @@ describe('CategorySelection', () => {
         options: [],
         optionsUrl: 'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categoryOptions?auth_key={{authKey}}&parent_id=2',
       },
+      'category-2-item-ids': {
+        label: 'select Category 2 items',
+        type: 'selection',
+        optional: true,
+        multiple: true,
+        searchable: true,
+        selectable: true,
+        sortable: [
+          { label: 'Default', by: 'default' },
+          { label: 'Name', by: 'label' },
+        ],
+        constraints: {},
+        options: [],
+        optionsUrl: 'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/itemOptions?auth_key={{authKey}}&category_id=2',
+      },
     });
   });
 
@@ -186,6 +201,79 @@ describe('CategorySelection', () => {
           'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/category/2/detailOptions?auth_key={{authKey}}&hide_price=false',
         disable: false,
       },
+      'category-2-item-ids': {
+        label: 'select Category 2 items',
+        type: 'selection',
+        optional: true,
+        multiple: true,
+        searchable: true,
+        selectable: true,
+        sortable: [
+          { label: 'Default', by: 'default' },
+          { label: 'Name', by: 'label' },
+        ],
+        constraints: {},
+        options: [],
+        optionsUrl: 'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/itemOptions?auth_key={{authKey}}&category_id=2',
+      },
+    });
+  });
+
+  it('should hide the item selection if item detail option is deselected', () => {
+    const values = {
+      categoryIds: ['1', '2'],
+      'category-2-details': ['name_detail', 'subcategory_detail'],
+    };
+    const builderState = {
+      inputs: [
+        {
+          path: ['categoryIds'],
+          state: { selectedOption: { label: 'Category 2', value: '2' } },
+        },
+      ],
+    };
+    toPlainObject(new CategorySelection().getProps(values, builderState)).should.eql({
+      categoryIds: {
+        label: 'select categories',
+        type: 'selection',
+        optional: true,
+        multiple: true,
+        searchable: true,
+        selectable: true,
+        sortable: [
+          { label: 'Default', by: 'default' },
+          { label: 'Name', by: 'label' },
+        ],
+        constraints: {},
+        options: [],
+        optionsUrl: 'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categoryOptions?auth_key={{authKey}}&parent_id=0',
+      },
+      'category-2-details': {
+        label: 'select Category 2 details',
+        type: 'selection',
+        optional: true,
+        multiple: true,
+        constraints: {},
+        options: [],
+        optionsUrl:
+          'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/category/2/detailOptions?auth_key={{authKey}}&hide_price=false',
+        disable: false,
+      },
+      'category-2-subcategory-ids': {
+        label: 'select Category 2 sub-categories',
+        type: 'selection',
+        optional: true,
+        multiple: true,
+        searchable: true,
+        selectable: true,
+        sortable: [
+          { label: 'Default', by: 'default' },
+          { label: 'Name', by: 'label' },
+        ],
+        constraints: {},
+        options: [],
+        optionsUrl: 'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categoryOptions?auth_key={{authKey}}&parent_id=2',
+      },
     });
   });
 
@@ -258,6 +346,81 @@ describe('CategorySelection', () => {
         options: [],
         optionsUrl:
           'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/category/3/detailOptions?auth_key={{authKey}}&hide_price=true',
+        disable: false,
+      },
+    });
+  });
+
+  it('should hide the item detail price option if the category pricing option is deselected', () => {
+    const values = {
+      categoryIds: ['1', '2'],
+      'category-2-details': ['name_detail', 'item_detail'],
+      'category-2-item-ids': ['3', '4'],
+    };
+    const builderState = {
+      inputs: [
+        {
+          path: ['categoryIds'],
+          state: { selectedOption: { label: 'Category 2', value: '2' } },
+        },
+        {
+          path: ['category-2-item-ids'],
+          state: { selectedOption: { label: 'Item 3', value: '3' } },
+        },
+      ],
+    };
+    toPlainObject(new CategorySelection().getProps(values, builderState)).should.eql({
+      categoryIds: {
+        label: 'select categories',
+        type: 'selection',
+        optional: true,
+        multiple: true,
+        searchable: true,
+        selectable: true,
+        sortable: [
+          { label: 'Default', by: 'default' },
+          { label: 'Name', by: 'label' },
+        ],
+        constraints: {},
+        options: [],
+        optionsUrl: 'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categoryOptions?auth_key={{authKey}}&parent_id=0',
+      },
+      'category-2-details': {
+        label: 'select Category 2 details',
+        type: 'selection',
+        optional: true,
+        multiple: true,
+        constraints: {},
+        options: [],
+        optionsUrl:
+          'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/category/2/detailOptions?auth_key={{authKey}}&hide_price=false',
+        disable: false,
+      },
+      'category-2-item-ids': {
+        label: 'select Category 2 items',
+        type: 'selection',
+        optional: true,
+        multiple: true,
+        searchable: true,
+        selectable: true,
+        sortable: [
+          { label: 'Default', by: 'default' },
+          { label: 'Name', by: 'label' },
+        ],
+        constraints: {},
+        options: [],
+        optionsUrl: 'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/itemOptions?auth_key={{authKey}}&category_id=2',
+      },
+      'item-3-details': {
+        label: 'select Item 3 details',
+        type: 'selection',
+        optional: true,
+        multiple: true,
+        constraints: {},
+        options: [],
+        optionsUrl:
+          'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/item/3/detailOptions?' +
+          'auth_key={{authKey}}&hide_price=true&location_id={{locationId}}',
         disable: false,
       },
     });

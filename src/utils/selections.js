@@ -98,6 +98,75 @@ class CategoryDetailSelection extends Selection {
       props = { ...props, ...subcategorySelection.getProps(values, builderState) };
     }
 
+    if (selectedDetails.includes(DETAIL_OPTIONS.ITEMS)) {
+      const itemSelection = new ItemSelection(this.category, hideChildPrice);
+      props = { ...props, ...itemSelection.getProps(values, builderState) };
+    }
+
     return props;
+  }
+}
+
+class ItemSelection extends Selection {
+  constructor(category, hidePrice) {
+    super();
+    this.category = category || {};
+    this.hidePrice = hidePrice;
+  }
+
+  get propId() {
+    return `category-${this.category.id}-item-ids`;
+  }
+
+  get prop() {
+    const label = `select ${this.category.name} items`;
+    return PropTypes.selection(label)
+      .multiple()
+      .searchable()
+      .selectable()
+      .sortable([
+        { label: 'Default', by: 'default' },
+        { label: 'Name', by: 'label' },
+      ])
+      .optionsUrl(
+        `${RAYDIANT_APP_LS_RETAIL_BASE_URL}/itemOptions?` +
+          `auth_key={{authKey}}&category_id=${this.category ? this.category.id : 0}`
+      );
+  }
+
+  getProps(values, builderState) {
+    const focusedOption = this.getFocusedOption(builderState);
+    if (!focusedOption || !focusedOption.value) {
+      return { [this.propId]: this.prop };
+    }
+
+    const selectedIds = this.getSelectedIds(values) || [];
+    const detailDisabled = !selectedIds.includes(focusedOption.value);
+    const item = { id: focusedOption.value, name: focusedOption.label };
+    const detailSelection = new ItemDetailSelection(item, this.hidePrice, detailDisabled);
+    return { [this.propId]: this.prop, [detailSelection.propId]: detailSelection.prop };
+  }
+}
+
+class ItemDetailSelection extends Selection {
+  constructor(item, hidePrice = false, disabled = false) {
+    super();
+    this.item = item;
+    this.hidePrice = hidePrice;
+    this.disabled = disabled;
+  }
+
+  get propId() {
+    return `item-${this.item.id}-details`;
+  }
+
+  get prop() {
+    return PropTypes.selection(`select ${this.item.name} details`)
+      .multiple()
+      .optionsUrl(
+        `${RAYDIANT_APP_LS_RETAIL_BASE_URL}/item/${this.item.id}/detailOptions?` +
+          `auth_key={{authKey}}&hide_price=${this.hidePrice}&location_id={{locationId}}`
+      )
+      .disable(this.disabled);
   }
 }
