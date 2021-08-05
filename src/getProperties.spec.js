@@ -47,6 +47,103 @@ describe('getProperties', () => {
     });
   });
 
+  describe('dynamic props', () => {
+    it('should add dynamic props if connected and a location is selected', () => {
+      const properties = toPlainObject(getProperties({ presentation: { values: {} } }));
+      properties.should.not.have.properties(['category-ids']);
+
+      const values = {
+        authKey: 'auth-key',
+        locationId: 'location-id',
+        categoryIds: ['1', '2'],
+        'category-2-details': ['name_detail', 'item_detail', 'subcategory_detail', 'pricing_detail'],
+        'category-2-subcategory-ids': ['3', '4'],
+        'category-3-details': ['name_detail', 'item_detail', 'subcategory_detail', 'pricing_detail'],
+      };
+      const builderState = {
+        inputs: [
+          {
+            path: ['categoryIds'],
+            state: { selectedOption: { label: 'Category 2', value: '2' } },
+          },
+          {
+            path: ['category-2-subcategory-ids'],
+            state: { selectedOption: { label: 'Category 3', value: '3' } },
+          },
+        ],
+      };
+      toPlainObject(getProperties({ presentation: { values }, builderState })).should.containEql({
+        categoryIds: {
+          label: 'select categories',
+          type: 'selection',
+          optional: true,
+          multiple: true,
+          searchable: true,
+          selectable: true,
+          sortable: [
+            { label: 'Default', by: 'default' },
+            { label: 'Name', by: 'label' },
+          ],
+          constraints: {},
+          options: [],
+          optionsUrl: 'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categoryOptions?auth_key={{authKey}}&parent_id=0',
+        },
+        'category-2-details': {
+          label: 'select Category 2 details',
+          type: 'selection',
+          optional: true,
+          multiple: true,
+          constraints: {},
+          options: [],
+          optionsUrl:
+            'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/category/2/detailOptions?auth_key={{authKey}}&hide_price=false',
+          disable: false,
+        },
+        'category-2-subcategory-ids': {
+          label: 'select Category 2 sub-categories',
+          type: 'selection',
+          optional: true,
+          multiple: true,
+          searchable: true,
+          selectable: true,
+          sortable: [
+            { label: 'Default', by: 'default' },
+            { label: 'Name', by: 'label' },
+          ],
+          constraints: {},
+          options: [],
+          optionsUrl: 'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categoryOptions?auth_key={{authKey}}&parent_id=2',
+        },
+        'category-3-details': {
+          label: 'select Category 3 details',
+          type: 'selection',
+          optional: true,
+          multiple: true,
+          constraints: {},
+          options: [],
+          optionsUrl:
+            'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/category/3/detailOptions?auth_key={{authKey}}&hide_price=false',
+          disable: false,
+        },
+        'category-3-subcategory-ids': {
+          label: 'select Category 3 sub-categories',
+          type: 'selection',
+          optional: true,
+          multiple: true,
+          searchable: true,
+          selectable: true,
+          sortable: [
+            { label: 'Default', by: 'default' },
+            { label: 'Name', by: 'label' },
+          ],
+          constraints: {},
+          options: [],
+          optionsUrl: 'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categoryOptions?auth_key={{authKey}}&parent_id=3',
+        },
+      });
+    });
+  });
+
   describe('duration', () => {
     it('should have correct attributes', () => {
       const properties = toPlainObject(getProperties({ presentation: { values: {} } }));
