@@ -1,5 +1,8 @@
 import * as PropTypes from 'raydiant-kit/prop-types';
 
+import { CategorySelection } from './utils/selections';
+import isValidId from './utils/isValidId';
+
 const { RAYDIANT_APP_LS_RETAIL_BASE_URL } = process.env;
 
 const initialProps = {
@@ -7,8 +10,9 @@ const initialProps = {
   selectedPaths: [],
 };
 
-export default ({ presentation } = initialProps) => {
-  const { authKey } = presentation.values;
+export default ({ presentation, builderState } = initialProps) => {
+  const { authKey, locationId } = presentation.values;
+  const showDetails = authKey && isValidId(locationId);
   return {
     authKey: PropTypes.oAuth('connect to Lightspeed')
       .authUrl(`${RAYDIANT_APP_LS_RETAIL_BASE_URL}/auth`)
@@ -18,6 +22,7 @@ export default ({ presentation } = initialProps) => {
     locationId: PropTypes.selection('select a business location')
       .optionsUrl(`${RAYDIANT_APP_LS_RETAIL_BASE_URL}/locationOptions?auth_key={{authKey}}`)
       .hide(!authKey),
+    ...(showDetails && new CategorySelection().getProps(presentation.values, builderState)),
     duration: PropTypes.number('duration').min(5).default(120).helperText('time in seconds.'),
   };
 };
