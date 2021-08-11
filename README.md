@@ -16,6 +16,8 @@ Description for lightspeed-retail
 | `categoryIds`                           | `selection` | Selected category IDs to be displayed                                  |
 | `category-[categoryId]-details`         | `selection` | Selected category details to be displayed                              |
 | `category-[categoryId]-subcategory-ids` | `selection` | Selected sub category IDs to be displayed                              |
+| `category-[categoryId]-item-ids`        | `selection` | Selected category's item IDs to be displayed                           |
+| `item-[itemId]-details`                 | `selection` | Selected item details to be displayed                                  |
 | `duration`                              | `number`    | Manual display time in seconds                                         |
 
 ---

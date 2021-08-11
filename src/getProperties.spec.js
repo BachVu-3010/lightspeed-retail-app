@@ -57,6 +57,7 @@ describe('getProperties', () => {
         locationId: 'location-id',
         categoryIds: ['1', '2'],
         'category-2-details': ['name_detail', 'item_detail', 'subcategory_detail', 'pricing_detail'],
+        'category-2-item-ids': ['item-1'],
         'category-2-subcategory-ids': ['3', '4'],
         'category-3-details': ['name_detail', 'item_detail', 'subcategory_detail', 'pricing_detail'],
       };
@@ -69,6 +70,10 @@ describe('getProperties', () => {
           {
             path: ['category-2-subcategory-ids'],
             state: { selectedOption: { label: 'Category 3', value: '3' } },
+          },
+          {
+            path: ['category-2-item-ids'],
+            state: { selectedOption: { label: 'Item 2', value: 'item-2' } },
           },
         ],
       };
@@ -139,6 +144,48 @@ describe('getProperties', () => {
           constraints: {},
           options: [],
           optionsUrl: 'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categoryOptions?auth_key={{authKey}}&parent_id=3',
+        },
+        'category-3-item-ids': {
+          label: 'select Category 3 items',
+          type: 'selection',
+          optional: true,
+          multiple: true,
+          searchable: true,
+          selectable: true,
+          sortable: [
+            { label: 'Default', by: 'default' },
+            { label: 'Name', by: 'label' },
+          ],
+          constraints: {},
+          options: [],
+          optionsUrl: 'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/itemOptions?auth_key={{authKey}}&category_id=3',
+        },
+        'category-2-item-ids': {
+          label: 'select Category 2 items',
+          type: 'selection',
+          optional: true,
+          multiple: true,
+          searchable: true,
+          selectable: true,
+          sortable: [
+            { label: 'Default', by: 'default' },
+            { label: 'Name', by: 'label' },
+          ],
+          constraints: {},
+          options: [],
+          optionsUrl: 'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/itemOptions?auth_key={{authKey}}&category_id=2',
+        },
+        'item-item-2-details': {
+          label: 'select Item 2 details',
+          type: 'selection',
+          optional: true,
+          multiple: true,
+          constraints: {},
+          options: [],
+          optionsUrl:
+            'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/item/item-2/detailOptions?' +
+            'auth_key={{authKey}}&hide_price=false&location_id={{locationId}}',
+          disable: true,
         },
       });
     });
