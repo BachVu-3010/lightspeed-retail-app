@@ -215,6 +215,27 @@ describe('getProperties', () => {
     });
   });
 
+  describe('outOfStockAction', () => {
+    it('should have correct attributes', () => {
+      const properties = toPlainObject(
+        getProperties({ presentation: { values: { authKey: 'auth-key', locationId: 'location-id' } } })
+      );
+      properties.outOfStockAction.should.eql({
+        label: 'out of stock items',
+        type: 'toggleButtonGroup',
+        optional: true,
+        constraints: {},
+        options: [
+          { label: 'Leave it', value: 'LEAVE_IT' },
+          { label: 'Remove', value: 'REMOVE' },
+          { label: 'Strikethrough', value: 'STRIKETHROUGH' },
+        ],
+        default: 'LEAVE_IT',
+        exclusive: true,
+      });
+    });
+  });
+
   describe('duration', () => {
     it('should have correct attributes', () => {
       const properties = toPlainObject(getProperties({ presentation: { values: {} } }));

@@ -9,16 +9,17 @@ Description for lightspeed-retail
 
 ## Properties
 
-| Name                                    | Type        | Description                                                            |
-| --------------------------------------- | ----------- | ---------------------------------------------------------------------- |
-| `authKey`                               | `oAuth`     | An auth key returned from lightspeed-retail-backend's /redeem endpoint |
-| `locationId`                            | `selection` | Selected LightSpeed bussines location's ID                             |
-| `categoryIds`                           | `selection` | Selected category IDs to be displayed                                  |
-| `category-[categoryId]-details`         | `selection` | Selected category details to be displayed                              |
-| `category-[categoryId]-subcategory-ids` | `selection` | Selected sub category IDs to be displayed                              |
-| `category-[categoryId]-item-ids`        | `selection` | Selected category's item IDs to be displayed                           |
-| `item-[itemId]-details`                 | `selection` | Selected item details to be displayed                                  |
-| `duration`                              | `number`    | Manual display time in seconds                                         |
+| Name                                    | Type                | Description                                                                      |
+| --------------------------------------- | ------------------- | -------------------------------------------------------------------------------- |
+| `authKey`                               | `oAuth`             | An auth key returned from lightspeed-retail-backend's /redeem endpoint           |
+| `locationId`                            | `selection`         | Selected LightSpeed bussines location's ID                                       |
+| `categoryIds`                           | `selection`         | Selected category IDs to be displayed                                            |
+| `category-[categoryId]-details`         | `selection`         | Selected category details to be displayed                                        |
+| `category-[categoryId]-subcategory-ids` | `selection`         | Selected sub category IDs to be displayed                                        |
+| `category-[categoryId]-item-ids`        | `selection`         | Selected category's item IDs to be displayed                                     |
+| `item-[itemId]-details`                 | `selection`         | Selected item details to be displayed                                            |
+| `outOfStockAction`                      | `toggleButtonGroup` | Action on out of stock items; `LEAVE_IT` (default), `REMOVE`, or `STRIKETHROUGH` |
+| `duration`                              | `number`            | Manual display time in seconds                                                   |
 
 ---
 

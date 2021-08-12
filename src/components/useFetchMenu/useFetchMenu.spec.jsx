@@ -5,10 +5,16 @@ import fetchMock from 'fetch-mock';
 import { setupRetryingRequestWithoutDelay } from '../../setupTest';
 import { itemPricing } from './Menu';
 import useFetchMenu from './';
+import { OUT_OF_STOCK_OPTIONS } from '../../constants';
 
 const createPrices = (price) => [
   { amount: '1', useTypeID: '1', useType: 'Default' },
   { amount: String(price), useTypeID: '2', useType: 'MSRP' },
+];
+
+const createItemShops = (itemId, stockCount) => [
+  { itemID: itemId, shopID: '0', qoh: '8', sellable: '7' },
+  { itemID: itemId, shopID: '1', qoh: String(stockCount), sellable: String(stockCount - 1) },
 ];
 
 describe('useFetchMenu', () => {
@@ -32,11 +38,41 @@ describe('useFetchMenu', () => {
     ]);
     fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&offset=0', {
       items: [
-        { itemID: '1', description: 'Item 1', categoryID: '1', prices: createPrices(1) },
-        { itemID: '2', description: 'Item 2', categoryID: '1', prices: createPrices(2) },
-        { itemID: '3', description: 'Item 3', categoryID: '3', prices: createPrices(3) },
-        { itemID: '4', description: 'Item 4', categoryID: '3', prices: createPrices(4) },
-        { itemID: '5', description: 'Item 5', categoryID: '5', prices: createPrices(5) },
+        {
+          itemID: '1',
+          description: 'Item 1',
+          categoryID: '1',
+          prices: createPrices(1),
+          itemShops: createItemShops('1', 1),
+        },
+        {
+          itemID: '2',
+          description: 'Item 2',
+          categoryID: '1',
+          prices: createPrices(2),
+          itemShops: createItemShops('1', 0),
+        },
+        {
+          itemID: '3',
+          description: 'Item 3',
+          categoryID: '3',
+          prices: createPrices(3),
+          itemShops: createItemShops('1', 12),
+        },
+        {
+          itemID: '4',
+          description: 'Item 4',
+          categoryID: '3',
+          prices: createPrices(4),
+          itemShops: createItemShops('1', 0),
+        },
+        {
+          itemID: '5',
+          description: 'Item 5',
+          categoryID: '5',
+          prices: createPrices(5),
+          itemShops: createItemShops('1', 13),
+        },
       ],
       pagination: { count: '5', offset: '0', limit: '100' },
     });
@@ -105,6 +141,112 @@ describe('useFetchMenu', () => {
       fetchMock
         .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&offset=0')
         .should.have.length(1);
+      done();
+    });
+  });
+
+  it('should strikethrough out of stock items if the action is strikethrough', (done) => {
+    const wrapper = mount(
+      <TestComponent
+        values={{
+          authKey: 'auth-key',
+          locationId: '1',
+          categoryIds: ['1', '2'],
+          outOfStockAction: OUT_OF_STOCK_OPTIONS.STRIKETHROUGH,
+        }}
+      />
+    );
+
+    setImmediate(() => {
+      const updatedChild = wrapper.update().find(ChildComponent);
+      updatedChild.prop('loading').should.be.false();
+      updatedChild.prop('hasError').should.be.false();
+      updatedChild.prop('rederingCategories').should.eql([
+        {
+          id: '1',
+          name: 'Category 1',
+          items: [
+            { id: '1', name: 'Item 1', pricing: itemPricing('1') },
+            { id: '2', name: 'Item 2', pricing: itemPricing('2'), strikethrough: true },
+          ],
+          subgroups: [
+            {
+              id: '3',
+              name: 'Category 1.1',
+              items: [
+                { id: '3', name: 'Item 3', pricing: itemPricing('3') },
+                { id: '4', name: 'Item 4', pricing: itemPricing('4'), strikethrough: true },
+              ],
+              subgroups: [
+                {
+                  id: '5',
+                  name: 'Category 1.1.1',
+                  items: [{ id: '5', name: 'Item 5', pricing: itemPricing('5') }],
+                  subgroups: [],
+                },
+              ],
+            },
+            {
+              id: '4',
+              name: 'Category 1.2',
+              items: [],
+              subgroups: [],
+            },
+          ],
+        },
+        { id: '2', name: 'Category 2', items: [], subgroups: [] },
+      ]);
+
+      done();
+    });
+  });
+
+  it('should remove out of stock items if the action is remove', (done) => {
+    const wrapper = mount(
+      <TestComponent
+        values={{
+          authKey: 'auth-key',
+          locationId: '1',
+          categoryIds: ['1', '2'],
+          outOfStockAction: OUT_OF_STOCK_OPTIONS.REMOVE,
+        }}
+      />
+    );
+
+    setImmediate(() => {
+      const updatedChild = wrapper.update().find(ChildComponent);
+      updatedChild.prop('loading').should.be.false();
+      updatedChild.prop('hasError').should.be.false();
+      updatedChild.prop('rederingCategories').should.eql([
+        {
+          id: '1',
+          name: 'Category 1',
+          items: [{ id: '1', name: 'Item 1', pricing: itemPricing('1') }],
+          subgroups: [
+            {
+              id: '3',
+              name: 'Category 1.1',
+              items: [{ id: '3', name: 'Item 3', pricing: itemPricing('3') }],
+              subgroups: [
+                {
+                  id: '5',
+                  name: 'Category 1.1.1',
+                  items: [{ id: '5', name: 'Item 5', pricing: itemPricing('5') }],
+                  subgroups: [],
+                },
+              ],
+            },
+            {
+              id: '4',
+              name: 'Category 1.2',
+              items: [],
+              subgroups: [],
+            },
+          ],
+        },
+        { id: '2', name: 'Category 2', items: [], subgroups: [] },
+      ]);
+
       done();
     });
   });
