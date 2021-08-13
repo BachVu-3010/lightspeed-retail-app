@@ -11,7 +11,7 @@ const initialProps = {
 };
 
 export default ({ presentation, builderState } = initialProps) => {
-  const { authKey, locationId } = presentation.values;
+  const { authKey, locationId, shouldFilterByTags } = presentation.values;
   const showDetails = authKey && isValidId(locationId);
 
   const {
@@ -25,6 +25,32 @@ export default ({ presentation, builderState } = initialProps) => {
     ...otherMenuProps
   } = getMenuProperties(presentation);
 
+  const detailProps = !showDetails
+    ? {}
+    : {
+        ...new CategorySelection().getProps(presentation.values, builderState),
+        shouldFilterByTags: PropTypes.boolean('filter by tags').default(false),
+        tags: PropTypes.selection('tags')
+          .multiple()
+          .searchable()
+          .optionsUrl(`${RAYDIANT_APP_LS_RETAIL_BASE_URL}/tagOptions?auth_key={{authKey}}`)
+          .hide(!shouldFilterByTags),
+        ...otherMenuProps,
+        outOfStockAction: PropTypes.toggleButtonGroup('out of stock items')
+          .exclusive()
+          .option(OUT_OF_STOCK_OPTIONS.LEAVE_IT, 'Leave it')
+          .option(OUT_OF_STOCK_OPTIONS.REMOVE, 'Remove')
+          .option(OUT_OF_STOCK_OPTIONS.STRIKETHROUGH, 'Strikethrough')
+          .default(OUT_OF_STOCK_OPTIONS.DEFAULT),
+        theme,
+        qrActive,
+        qrSource,
+        qrUrlContent,
+        qrImage,
+        qrSize,
+        qrCallToAction,
+      };
+
   return {
     authKey: PropTypes.oAuth('Connect to Lightspeed')
       .authUrl(`${RAYDIANT_APP_LS_RETAIL_BASE_URL}/auth`)
@@ -34,23 +60,7 @@ export default ({ presentation, builderState } = initialProps) => {
     locationId: PropTypes.selection('select a business location')
       .optionsUrl(`${RAYDIANT_APP_LS_RETAIL_BASE_URL}/locationOptions?auth_key={{authKey}}`)
       .hide(!authKey),
-    ...(showDetails && new CategorySelection().getProps(presentation.values, builderState)),
-    ...(showDetails && {
-      ...otherMenuProps,
-      outOfStockAction: PropTypes.toggleButtonGroup('out of stock items')
-        .exclusive()
-        .option(OUT_OF_STOCK_OPTIONS.LEAVE_IT, 'Leave it')
-        .option(OUT_OF_STOCK_OPTIONS.REMOVE, 'Remove')
-        .option(OUT_OF_STOCK_OPTIONS.STRIKETHROUGH, 'Strikethrough')
-        .default(OUT_OF_STOCK_OPTIONS.DEFAULT),
-      theme,
-      qrActive,
-      qrSource,
-      qrUrlContent,
-      qrImage,
-      qrSize,
-      qrCallToAction,
-    }),
+    ...detailProps,
     duration: PropTypes.number('duration').min(5).default(120).helperText('time in seconds.'),
   };
 };

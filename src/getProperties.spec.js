@@ -215,6 +215,59 @@ describe('getProperties', () => {
     });
   });
 
+  describe('shouldFilterByTags', () => {
+    it('should have correct attributes', () => {
+      const properties = toPlainObject(
+        getProperties({ presentation: { values: { authKey: 'auth-key', locationId: 'location-id' } } })
+      );
+      properties.shouldFilterByTags.should.eql({
+        label: 'filter by tags',
+        type: 'boolean',
+        constraints: {},
+        optional: true,
+        default: false,
+      });
+    });
+
+    it('should not shown if not connected', () => {
+      const properties = toPlainObject(getProperties({ presentation: { values: {} } }));
+      properties.should.not.have.property('shouldFilterByTags');
+    });
+  });
+
+  describe('tags', () => {
+    it('should have correct attributes', () => {
+      const properties = toPlainObject(
+        getProperties({ presentation: { values: { authKey: 'auth-key', locationId: 'location-id' } } })
+      );
+      properties.tags.should.eql({
+        label: 'tags',
+        type: 'selection',
+        optional: true,
+        multiple: true,
+        searchable: true,
+        constraints: {},
+        options: [],
+        optionsUrl: 'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/tagOptions?auth_key={{authKey}}',
+        hide: true,
+      });
+    });
+
+    it('should not shown if not connected', () => {
+      const properties = toPlainObject(getProperties({ presentation: { values: {} } }));
+      properties.should.not.have.property('tags');
+    });
+
+    it('should shown if shouldFilterByTags is true', () => {
+      const properties = toPlainObject(
+        getProperties({
+          presentation: { values: { authKey: 'auth-key', locationId: 'location-id', shouldFilterByTags: true } },
+        })
+      );
+      properties.tags.hide.should.be.false();
+    });
+  });
+
   describe('outOfStockAction', () => {
     it('should have correct attributes', () => {
       const properties = toPlainObject(

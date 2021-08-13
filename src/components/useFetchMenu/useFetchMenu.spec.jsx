@@ -51,6 +51,7 @@ describe('useFetchMenu', () => {
           categoryID: '1',
           prices: createPrices(2),
           itemShops: createItemShops('1', 0),
+          tags: ['tag1', 'tag2', 'tag3'],
         },
         {
           itemID: '3',
@@ -58,6 +59,7 @@ describe('useFetchMenu', () => {
           categoryID: '3',
           prices: createPrices(3),
           itemShops: createItemShops('1', 12),
+          tags: ['tag4'],
         },
         {
           itemID: '4',
@@ -65,6 +67,7 @@ describe('useFetchMenu', () => {
           categoryID: '3',
           prices: createPrices(4),
           itemShops: createItemShops('1', 0),
+          tags: ['tag3'],
         },
         {
           itemID: '5',
@@ -72,6 +75,7 @@ describe('useFetchMenu', () => {
           categoryID: '5',
           prices: createPrices(5),
           itemShops: createItemShops('1', 13),
+          tags: ['tag5'],
         },
       ],
       pagination: { count: '5', offset: '0', limit: '100' },
@@ -248,6 +252,112 @@ describe('useFetchMenu', () => {
       ]);
 
       done();
+    });
+  });
+
+  it('should be able to filter items by tags', (done) => {
+    const wrapper = mount(
+      <TestComponent
+        values={{
+          authKey: 'auth-key',
+          locationId: '1',
+          categoryIds: ['1', '2'],
+          shouldFilterByTags: false,
+          tags: ['tag3', 'tag4'],
+        }}
+      />
+    );
+
+    const noFilteredCategories = [
+      {
+        id: '1',
+        name: 'Category 1',
+        items: [
+          { id: '1', name: 'Item 1', pricing: itemPricing('1') },
+          { id: '2', name: 'Item 2', pricing: itemPricing('2') },
+        ],
+        subgroups: [
+          {
+            id: '3',
+            name: 'Category 1.1',
+            items: [
+              { id: '3', name: 'Item 3', pricing: itemPricing('3') },
+              { id: '4', name: 'Item 4', pricing: itemPricing('4') },
+            ],
+            subgroups: [
+              {
+                id: '5',
+                name: 'Category 1.1.1',
+                items: [{ id: '5', name: 'Item 5', pricing: itemPricing('5') }],
+                subgroups: [],
+              },
+            ],
+          },
+          { id: '4', name: 'Category 1.2', items: [], subgroups: [] },
+        ],
+      },
+      { id: '2', name: 'Category 2', items: [], subgroups: [] },
+    ];
+
+    setImmediate(() => {
+      wrapper.update().find(ChildComponent).prop('rederingCategories').should.eql(noFilteredCategories);
+
+      wrapper.setProps({
+        values: {
+          authKey: 'auth-key',
+          locationId: '1',
+          categoryIds: ['1', '2'],
+          shouldFilterByTags: true,
+        },
+      });
+
+      setImmediate(() => {
+        wrapper.update().find(ChildComponent).prop('rederingCategories').should.eql(noFilteredCategories);
+
+        setImmediate(() => {
+          wrapper.setProps({
+            values: {
+              authKey: 'auth-key',
+              locationId: '1',
+              categoryIds: ['1', '2'],
+              shouldFilterByTags: true,
+              tags: ['tag3', 'tag4'],
+            },
+          });
+
+          wrapper
+            .update()
+            .find(ChildComponent)
+            .prop('rederingCategories')
+            .should.eql([
+              {
+                id: '1',
+                name: 'Category 1',
+                items: [{ id: '2', name: 'Item 2', pricing: itemPricing('2') }],
+                subgroups: [
+                  {
+                    id: '3',
+                    name: 'Category 1.1',
+                    items: [
+                      { id: '3', name: 'Item 3', pricing: itemPricing('3') },
+                      { id: '4', name: 'Item 4', pricing: itemPricing('4') },
+                    ],
+                    subgroups: [{ id: '5', name: 'Category 1.1.1', items: [], subgroups: [] }],
+                  },
+                  { id: '4', name: 'Category 1.2', items: [], subgroups: [] },
+                ],
+              },
+              { id: '2', name: 'Category 2', items: [], subgroups: [] },
+            ]);
+
+          fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/location/1?auth_key=auth-key').should.have.length(1);
+          fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categories?auth_key=auth-key').should.have.length(1);
+          fetchMock
+            .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&offset=0')
+            .should.have.length(1);
+          done();
+        });
+      });
     });
   });
 

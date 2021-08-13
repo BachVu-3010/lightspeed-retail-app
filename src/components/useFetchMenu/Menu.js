@@ -106,7 +106,16 @@ class CategoryNode {
     const hideChildPrice = hidePrice || !selectedDetails.includes(DETAIL_OPTIONS.PRICING);
     if (selectedDetails.includes(DETAIL_OPTIONS.ITEMS)) {
       const items = this.getSelectedItems(values, itemsByCategory[this.id] || []);
-      category.items = items.map((item) => buildItem(values, item, location, hideChildPrice)).filter((item) => item);
+
+      const { shouldFilterByTags, tags } = values;
+      const filteredItems =
+        shouldFilterByTags && tags
+          ? items.filter((item) => (item.tags || []).some((tag) => tags.includes(tag)))
+          : items;
+
+      category.items = filteredItems
+        .map((item) => buildItem(values, item, location, hideChildPrice))
+        .filter((item) => item);
     }
 
     if (selectedDetails.includes(DETAIL_OPTIONS.SUBCATEGORIES)) {
