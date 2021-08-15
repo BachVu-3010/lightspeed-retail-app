@@ -1,12 +1,44 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { withRaydiantApp } from 'raydiant-kit';
+import MenuLayout from 'raydiant-menu';
 
+import useFetchMenu from './useFetchMenu';
+import Loading from './Loading';
 import logger from '../utils/logger';
 import './styles.css';
 
-export const LightSpeedRetail = ({ presentation: { values }, device, isPlaying, onReady, onComplete, onError }) => {
-  const { duration } = values;
+const useFireError = (onError, authKey, locationId, categories, hasError) => {
+  React.useEffect(() => {
+    if (!authKey) {
+      onError(new Error('Please connect to LightSpeed'));
+      return;
+    }
+    if (locationId === 'none') {
+      onError(new Error('No location found'));
+      return;
+    }
+  }, [authKey, locationId, onError]);
+
+  React.useEffect(() => {
+    // not fire error if failed to updating inventory data
+    if ((!categories || !categories.length) && hasError) {
+      onError(new Error('Failed to fetch inventory'));
+    }
+  }, [categories, hasError, onError]);
+};
+
+export const LightSpeedRetail = ({
+  presentation,
+  device,
+  isPlaying,
+  isDashboard,
+  isThumbnail,
+  onReady,
+  onComplete,
+  onError,
+}) => {
+  const { authKey, locationId, duration } = presentation.values;
 
   // Set logger's context with current device
   useEffect(() => {
@@ -23,32 +55,41 @@ export const LightSpeedRetail = ({ presentation: { values }, device, isPlaying, 
     return () => completeTimeout && clearTimeout(completeTimeout);
   }, [duration, isPlaying, onComplete]); // Add the app's variable that can restart onComplete here
 
-  // onReady on mount
-  useEffect(onReady, [onReady]);
+  // const [categories, loading, hasError] = [[], false, false];
+  const [categories, loading, hasError] = useFetchMenu(presentation.values);
 
-  // logging for changes
-  useEffect(() => {
-    logger.info(`Render with duration: ${duration}`);
-  }, [duration]);
+  useFireError(onError, authKey, locationId, categories, hasError);
+
+  // fire onReady to show the loading spinner on dashboard preview
+  React.useEffect(() => {
+    if (loading && isDashboard) {
+      onReady();
+    }
+  }, [onReady, isDashboard, loading]);
+
+  if (loading) {
+    return isDashboard ? <Loading title='Loading...' /> : null;
+  }
+
+  if (!categories || categories.length === 0) return null;
 
   return (
-    <main>
-      <h1>RaydiantKit</h1>
-      <h2>Screen signage SDK</h2>
-      <p>
-        For documentation and examples check out{' '}
-        <a href='https://github.com/mirainc/raydiant-kit' target='_blank' rel='noopener noreferrer'>
-          github.com/mirainc/raydiant-kit
-        </a>
-        .
-      </p>
-    </main>
+    <MenuLayout
+      categories={categories}
+      presentation={presentation}
+      onError={onError}
+      onReady={onReady}
+      isPlaying={isPlaying}
+      isThumbnail={isThumbnail}
+    />
   );
 };
 
 LightSpeedRetail.propTypes = {
   presentation: PropTypes.shape({
     values: PropTypes.shape({
+      authKey: PropTypes.string,
+      locationId: PropTypes.string,
       duration: PropTypes.number,
     }),
   }).isRequired,

@@ -14,7 +14,7 @@ describe('getProperties', () => {
     it('should have correct attributes', () => {
       const properties = toPlainObject(getProperties({ presentation: { values: {} } }));
       properties.authKey.should.eql({
-        label: 'connect to Lightspeed',
+        label: 'Connect to Lightspeed',
         type: 'oAuth',
         optional: false,
         constraints: {},
@@ -188,6 +188,30 @@ describe('getProperties', () => {
           disable: true,
         },
       });
+    });
+
+    it('should have menu layout properties', () => {
+      const properties = toPlainObject(
+        getProperties({ presentation: { values: { authKey: 'auth-key', locationId: 'location-id' } } })
+      );
+
+      properties.should.have.properties([
+        'qrActive',
+        'qrSource',
+        'qrUrlContent',
+        'qrImage',
+        'qrSize',
+        'qrCallToAction',
+        'shouldFormatPrice',
+        'currency',
+        'priceFormat',
+        'layout',
+        'image',
+        'enableAnimation',
+        'footnote',
+        'footnoteSize',
+        'theme',
+      ]);
     });
   });
 

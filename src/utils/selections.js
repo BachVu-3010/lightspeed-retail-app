@@ -64,7 +64,7 @@ export class CategorySelection extends Selection {
   }
 }
 
-class CategoryDetailSelection extends Selection {
+export class CategoryDetailSelection extends Selection {
   constructor(category, hidePrice, disabled) {
     super();
     this.category = category;
@@ -107,10 +107,10 @@ class CategoryDetailSelection extends Selection {
   }
 }
 
-class ItemSelection extends Selection {
+export class ItemSelection extends Selection {
   constructor(category, hidePrice) {
     super();
-    this.category = category || {};
+    this.category = category;
     this.hidePrice = hidePrice;
   }
 
@@ -148,7 +148,7 @@ class ItemSelection extends Selection {
   }
 }
 
-class ItemDetailSelection extends Selection {
+export class ItemDetailSelection extends Selection {
   constructor(item, hidePrice = false, disabled = false) {
     super();
     this.item = item;
