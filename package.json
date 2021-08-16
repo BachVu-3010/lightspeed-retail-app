@@ -1,6 +1,6 @@
 {
   "name": "lightspeed-retail",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "private": true,
   "dependencies": {
     "exponential-backoff": "^3.1.0",
