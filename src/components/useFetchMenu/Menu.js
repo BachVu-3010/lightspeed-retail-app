@@ -1,7 +1,7 @@
 import groupBy from 'lodash.groupby';
 import memoize from 'lodash.memoize';
 
-import { DEFAULT_CATEGORY_DETAILS, DEFAULT_ITEM_DETAILS, DETAIL_OPTIONS } from '../../constants';
+import { DEFAULT_CATEGORY_DETAILS, DEFAULT_ITEM_DETAILS, DETAIL_OPTIONS, OUT_OF_STOCK_OPTIONS } from '../../constants';
 import { CategorySelection, CategoryDetailSelection, ItemSelection, ItemDetailSelection } from '../../utils/selections';
 
 const flatMap = (arr, func) => [].concat.apply([], arr.map(func));
@@ -14,7 +14,7 @@ export const itemPricing = memoize(
   (...args) => args.join('__')
 );
 
-const buildItem = (values, item, pricingLevelId, hidePrice) => {
+const buildItem = (values, item, location, hidePrice) => {
   const itemsDetailSelection = new ItemDetailSelection({ id: item.itemID });
   const details = itemsDetailSelection.getSelectedIds(values) || DEFAULT_ITEM_DETAILS;
   if (details.length === 0) return undefined;
@@ -26,11 +26,23 @@ const buildItem = (values, item, pricingLevelId, hidePrice) => {
 
   if (!hidePrice && details.includes(DETAIL_OPTIONS.PRICE)) {
     const prices = item.prices || [];
-    const foundPrice = prices.find((price) => price.useTypeID === pricingLevelId) || prices[0];
+    const foundPrice = prices.find((price) => price.useTypeID === location.priceLevelID) || prices[0];
     if (foundPrice && foundPrice.amount) {
       formattedItem.pricing = itemPricing(foundPrice.amount);
     }
   }
+  const itemShop = (item.itemShops || []).find((itemShop) => itemShop.shopID === location.shopID);
+  if (itemShop) {
+    const stockCount = parseFloat(String(itemShop.qoh));
+    if (stockCount <= 0) {
+      const { outOfStockAction = OUT_OF_STOCK_OPTIONS.DEFAULT } = values;
+      if (outOfStockAction === OUT_OF_STOCK_OPTIONS.REMOVE) return undefined;
+      if (outOfStockAction === OUT_OF_STOCK_OPTIONS.STRIKETHROUGH) {
+        formattedItem.strikethrough = true;
+      }
+    }
+  }
+
   return formattedItem;
 };
 
@@ -82,7 +94,7 @@ class CategoryNode {
     return items.filter((item) => selectedItemIds.includes(item.itemID));
   }
 
-  build(values, itemsByCategory, priceLevelId, hidePrice = false) {
+  build(values, itemsByCategory, location, hidePrice = false) {
     const selectedDetails = this.getDetails(values);
     if (selectedDetails.length === 0) return undefined;
 
@@ -94,12 +106,12 @@ class CategoryNode {
     const hideChildPrice = hidePrice || !selectedDetails.includes(DETAIL_OPTIONS.PRICING);
     if (selectedDetails.includes(DETAIL_OPTIONS.ITEMS)) {
       const items = this.getSelectedItems(values, itemsByCategory[this.id] || []);
-      category.items = items.map((item) => buildItem(values, item, priceLevelId, hideChildPrice));
+      category.items = items.map((item) => buildItem(values, item, location, hideChildPrice)).filter((item) => item);
     }
 
     if (selectedDetails.includes(DETAIL_OPTIONS.SUBCATEGORIES)) {
       category.subgroups = this.getSubCategories(values).map((category) =>
-        category.build(values, itemsByCategory, priceLevelId, hideChildPrice)
+        category.build(values, itemsByCategory, location, hideChildPrice)
       );
     }
     return category;
@@ -129,8 +141,6 @@ export default class Menu {
       return [];
     }
 
-    return this.getCategories(values).map((categoryNode) =>
-      categoryNode.build(values, itemsByCategory, location.priceLevelID)
-    );
+    return this.getCategories(values).map((categoryNode) => categoryNode.build(values, itemsByCategory, location));
   }
 }

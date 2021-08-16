@@ -3,7 +3,7 @@ import getMenuProperties from 'raydiant-menu/properties';
 
 import { CategorySelection } from './utils/selections';
 import isValidId from './utils/isValidId';
-import { RAYDIANT_APP_LS_RETAIL_BASE_URL } from './constants';
+import { OUT_OF_STOCK_OPTIONS, RAYDIANT_APP_LS_RETAIL_BASE_URL } from './constants';
 
 const initialProps = {
   presentation: { values: {} },
@@ -13,6 +13,18 @@ const initialProps = {
 export default ({ presentation, builderState } = initialProps) => {
   const { authKey, locationId } = presentation.values;
   const showDetails = authKey && isValidId(locationId);
+
+  const {
+    theme,
+    qrActive,
+    qrSource,
+    qrUrlContent,
+    qrImage,
+    qrSize,
+    qrCallToAction,
+    ...otherMenuProps
+  } = getMenuProperties(presentation);
+
   return {
     authKey: PropTypes.oAuth('Connect to Lightspeed')
       .authUrl(`${RAYDIANT_APP_LS_RETAIL_BASE_URL}/auth`)
@@ -23,7 +35,22 @@ export default ({ presentation, builderState } = initialProps) => {
       .optionsUrl(`${RAYDIANT_APP_LS_RETAIL_BASE_URL}/locationOptions?auth_key={{authKey}}`)
       .hide(!authKey),
     ...(showDetails && new CategorySelection().getProps(presentation.values, builderState)),
-    ...(showDetails && getMenuProperties(presentation)),
+    ...(showDetails && {
+      ...otherMenuProps,
+      outOfStockAction: PropTypes.toggleButtonGroup('out of stock items')
+        .exclusive()
+        .option(OUT_OF_STOCK_OPTIONS.LEAVE_IT, 'Leave it')
+        .option(OUT_OF_STOCK_OPTIONS.REMOVE, 'Remove')
+        .option(OUT_OF_STOCK_OPTIONS.STRIKETHROUGH, 'Strikethrough')
+        .default(OUT_OF_STOCK_OPTIONS.DEFAULT),
+      theme,
+      qrActive,
+      qrSource,
+      qrUrlContent,
+      qrImage,
+      qrSize,
+      qrCallToAction,
+    }),
     duration: PropTypes.number('duration').min(5).default(120).helperText('time in seconds.'),
   };
 };
