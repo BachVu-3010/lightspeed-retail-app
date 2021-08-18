@@ -35,20 +35,6 @@ export default ({ presentation, builderState } = initialProps) => {
           .searchable()
           .optionsUrl(`${RAYDIANT_APP_LS_RETAIL_BASE_URL}/tagOptions?auth_key={{authKey}}`)
           .hide(!shouldFilterByTags),
-        ...otherMenuProps,
-        outOfStockAction: PropTypes.toggleButtonGroup('out of stock items')
-          .exclusive()
-          .option(OUT_OF_STOCK_OPTIONS.LEAVE_IT, 'Leave it')
-          .option(OUT_OF_STOCK_OPTIONS.REMOVE, 'Remove')
-          .option(OUT_OF_STOCK_OPTIONS.STRIKETHROUGH, 'Strikethrough')
-          .default(OUT_OF_STOCK_OPTIONS.DEFAULT),
-        theme,
-        qrActive,
-        qrSource,
-        qrUrlContent,
-        qrImage,
-        qrSize,
-        qrCallToAction,
       };
 
   return {
@@ -61,6 +47,20 @@ export default ({ presentation, builderState } = initialProps) => {
       .optionsUrl(`${RAYDIANT_APP_LS_RETAIL_BASE_URL}/locationOptions?auth_key={{authKey}}`)
       .hide(!authKey),
     ...detailProps,
+    ...otherMenuProps,
+    outOfStockAction: PropTypes.toggleButtonGroup('out of stock items')
+      .exclusive()
+      .option(OUT_OF_STOCK_OPTIONS.LEAVE_IT, 'Leave it')
+      .option(OUT_OF_STOCK_OPTIONS.REMOVE, 'Remove')
+      .option(OUT_OF_STOCK_OPTIONS.STRIKETHROUGH, 'Strikethrough')
+      .default(OUT_OF_STOCK_OPTIONS.DEFAULT),
+    theme,
+    qrActive,
+    qrSource,
+    qrUrlContent,
+    qrImage,
+    qrSize,
+    qrCallToAction,
     duration: PropTypes.number('duration').min(5).default(120).helperText('time in seconds.'),
   };
 };

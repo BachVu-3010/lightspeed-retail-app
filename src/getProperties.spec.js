@@ -191,9 +191,7 @@ describe('getProperties', () => {
     });
 
     it('should have menu layout properties', () => {
-      const properties = toPlainObject(
-        getProperties({ presentation: { values: { authKey: 'auth-key', locationId: 'location-id' } } })
-      );
+      const properties = toPlainObject(getProperties({ presentation: { values: {} } }));
 
       properties.should.have.properties([
         'qrActive',
