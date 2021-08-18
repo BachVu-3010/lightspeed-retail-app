@@ -45,6 +45,8 @@ export default ({ presentation, builderState } = initialProps) => {
       .required(),
     locationId: PropTypes.selection('select a business location')
       .optionsUrl(`${RAYDIANT_APP_LS_RETAIL_BASE_URL}/locationOptions?auth_key={{authKey}}`)
+      .helperText("What's This?")
+      .helperLink('https://support.raydiant.com/hc/en-us/articles/4403847724820')
       .hide(!authKey),
     ...detailProps,
     ...otherMenuProps,
@@ -61,6 +63,6 @@ export default ({ presentation, builderState } = initialProps) => {
     qrImage,
     qrSize,
     qrCallToAction,
-    duration: PropTypes.number('duration').min(5).default(120).helperText('time in seconds.'),
+    duration: PropTypes.number('duration').min(5).default(120).helperText('Time in seconds.'),
   };
 };
