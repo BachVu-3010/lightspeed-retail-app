@@ -7,6 +7,7 @@ export const DETAIL_OPTIONS = {
   SUBCATEGORIES: 'subcategory_detail',
   PRICING: 'pricing_detail',
   PRICE: 'price_detail',
+  MODIFIERS: 'modifier_detail',
 };
 
 export const DEFAULT_CATEGORY_DETAILS = [
@@ -16,7 +17,7 @@ export const DEFAULT_CATEGORY_DETAILS = [
   DETAIL_OPTIONS.PRICING,
 ];
 
-export const DEFAULT_ITEM_DETAILS = [DETAIL_OPTIONS.NAME, DETAIL_OPTIONS.PRICE];
+export const DEFAULT_ITEM_DETAILS = [DETAIL_OPTIONS.NAME, DETAIL_OPTIONS.PRICE, DETAIL_OPTIONS.MODIFIERS];
 
 export const OUT_OF_STOCK_OPTIONS = {
   LEAVE_IT: 'LEAVE_IT',

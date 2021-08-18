@@ -2,9 +2,16 @@ import groupBy from 'lodash.groupby';
 import memoize from 'lodash.memoize';
 
 import { DEFAULT_CATEGORY_DETAILS, DEFAULT_ITEM_DETAILS, DETAIL_OPTIONS, OUT_OF_STOCK_OPTIONS } from '../../constants';
-import { CategorySelection, CategoryDetailSelection, ItemSelection, ItemDetailSelection } from '../../utils/selections';
+import {
+  CategorySelection,
+  CategoryDetailSelection,
+  ItemSelection,
+  ItemDetailSelection,
+  ModifierSelection,
+} from '../../utils/selections';
 
 const flatMap = (arr, func) => [].concat.apply([], arr.map(func));
+const isEmpty = (arr) => !arr || !arr.length;
 
 export const itemPricing = memoize(
   (price) => (priceFormatter) => {
@@ -14,37 +21,103 @@ export const itemPricing = memoize(
   (...args) => args.join('__')
 );
 
-const buildItem = (values, item, location, hidePrice) => {
-  const itemsDetailSelection = new ItemDetailSelection({ id: item.itemID });
-  const details = itemsDetailSelection.getSelectedIds(values) || DEFAULT_ITEM_DETAILS;
-  if (details.length === 0) return undefined;
+class Item {
+  constructor(item) {
+    this.id = item.itemID;
+    this.item = item;
 
-  const formattedItem = { id: item.itemID };
-  if (details.includes(DETAIL_OPTIONS.NAME)) {
-    formattedItem.name = item.description; // in LS Retail, item's decription is item's name
+    this.detailSelection = new ItemDetailSelection({ id: this.id });
+    this.modifierSelection = new ModifierSelection({ id: this.id });
   }
 
-  if (!hidePrice && details.includes(DETAIL_OPTIONS.PRICE)) {
-    const prices = item.prices || [];
+  getDetails(values) {
+    return this.detailSelection.getSelectedIds(values) || DEFAULT_ITEM_DETAILS;
+  }
+
+  getSelectedVariants(values) {
+    const variants = this.item.variants || [];
+    if (!variants) return variants;
+
+    const selectedDetails = this.getDetails(values);
+    if (!selectedDetails.includes(DETAIL_OPTIONS.MODIFIERS)) return [];
+
+    const selectedModifierIds = this.modifierSelection.getSelectedIds(values);
+    if (selectedModifierIds === undefined) return variants;
+
+    return variants.filter((variant) => selectedModifierIds.includes(variant.itemID));
+  }
+
+  getPricing(location) {
+    const prices = this.item.prices || [];
     const foundPrice = prices.find((price) => price.useTypeID === location.priceLevelID) || prices[0];
     if (foundPrice && foundPrice.amount) {
-      formattedItem.pricing = itemPricing(foundPrice.amount);
+      return itemPricing(foundPrice.amount);
     }
+    return undefined;
   }
-  const itemShop = (item.itemShops || []).find((itemShop) => itemShop.shopID === location.shopID);
-  if (itemShop) {
+
+  isOutOfStockAt(location) {
+    const itemShop = (this.item.itemShops || []).find((itemShop) => itemShop.shopID === location.shopID);
+    if (!itemShop) return false;
+
     const stockCount = parseFloat(String(itemShop.qoh));
-    if (stockCount <= 0) {
-      const { outOfStockAction = OUT_OF_STOCK_OPTIONS.DEFAULT } = values;
+    return stockCount <= 0;
+  }
+
+  build(values, location, hidePrice = false) {
+    const details = this.getDetails(values);
+    if (details.length === 0) return undefined;
+
+    const formattedItem = { id: this.id };
+
+    // apply out of stock action
+    const { outOfStockAction = OUT_OF_STOCK_OPTIONS.DEFAULT } = values;
+    if (this.isOutOfStockAt(location)) {
       if (outOfStockAction === OUT_OF_STOCK_OPTIONS.REMOVE) return undefined;
       if (outOfStockAction === OUT_OF_STOCK_OPTIONS.STRIKETHROUGH) {
         formattedItem.strikethrough = true;
       }
     }
-  }
 
-  return formattedItem;
-};
+    if (details.includes(DETAIL_OPTIONS.NAME)) {
+      formattedItem.name = this.item.description; // in LS Retail, item's decription is item's name
+    }
+
+    const shouldHidePrice = hidePrice || !details.includes(DETAIL_OPTIONS.PRICE);
+    if (!shouldHidePrice) {
+      formattedItem.pricing = this.getPricing(location);
+    }
+
+    const variants = this.getSelectedVariants(values);
+    if (details.includes(DETAIL_OPTIONS.MODIFIERS)) {
+      formattedItem.variants = variants
+        .map((v) => new Item(v).build(values, location, shouldHidePrice))
+        .filter((item) => item);
+    }
+
+    // filter by tags
+    const { shouldFilterByTags, tags } = values;
+    const itemTags = this.item.tags || [];
+    if (shouldFilterByTags && tags && isEmpty(formattedItem.variants)) {
+      const tagMatched = itemTags.length && itemTags.some((tag) => tags.includes(tag));
+      if (!tagMatched) return undefined;
+    }
+
+    // remove matrix if its vairants is all filtered by stock count or tags
+    if (!isEmpty(variants) && isEmpty(formattedItem.variants)) {
+      return undefined;
+    }
+
+    // if all variant is striked through, strikethrough the matrix too
+    if (!isEmpty(formattedItem.variants) && formattedItem.variants.every((v) => v.strikethrough)) {
+      formattedItem.strikethrough = true;
+    }
+
+    if (isEmpty(formattedItem.variants)) delete formattedItem.variants;
+
+    return formattedItem;
+  }
+}
 
 class CategoryNode {
   constructor(category, categoriesByParentId) {
@@ -107,14 +180,8 @@ class CategoryNode {
     if (selectedDetails.includes(DETAIL_OPTIONS.ITEMS)) {
       const items = this.getSelectedItems(values, itemsByCategory[this.id] || []);
 
-      const { shouldFilterByTags, tags } = values;
-      const filteredItems =
-        shouldFilterByTags && tags
-          ? items.filter((item) => (item.tags || []).some((tag) => tags.includes(tag)))
-          : items;
-
-      category.items = filteredItems
-        .map((item) => buildItem(values, item, location, hideChildPrice))
+      category.items = items
+        .map((item) => new Item(item).build(values, location, hideChildPrice))
         .filter((item) => item);
     }
 

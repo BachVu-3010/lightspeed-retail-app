@@ -23,6 +23,43 @@ const fetchAll = async (url, offset = 0) => {
   return items.concat(...nextItems);
 };
 
+const remove_matrix_prefix = (prefix) => ({ description, ...rest }) => ({
+  ...rest,
+  description: description.slice(prefix.length).trim(),
+});
+
+const merge_matrix_items = (items, matrices) => {
+  if (!matrices || !items) return items;
+
+  const matrixDescriptionById = {};
+  matrices.forEach((matrix) => {
+    matrixDescriptionById[matrix.itemMatrixID] = matrix.description;
+  });
+
+  const matrixItems = items.filter((item) => item.itemMatrixID && item.itemMatrixID !== '0');
+  const matrixItemsByMatrixId = groupBy(matrixItems, 'itemMatrixID');
+
+  const merged = [];
+  const addedMatrixIds = [];
+  items.forEach((item) => {
+    if (item.itemMatrixID && item.itemMatrixID !== '0' && item.itemMatrixID in matrixItemsByMatrixId) {
+      if (!addedMatrixIds.includes(item.itemMatrixID)) {
+        const matrixDescription = matrixDescriptionById[item.itemMatrixID];
+        merged.push({
+          itemID: `matrix-${item.itemMatrixID}`,
+          categoryID: item.categoryID,
+          description: matrixDescription,
+          variants: (matrixItemsByMatrixId[item.itemMatrixID] || []).map(remove_matrix_prefix(matrixDescription)),
+        });
+        addedMatrixIds.push(item.itemMatrixID);
+      }
+    } else {
+      merged.push(item);
+    }
+  });
+  return merged;
+};
+
 export default (authKey, categoryIds) => {
   const [itemsByCategory, setItemsByCategory] = React.useState({});
   const [fetchingState, setFetchingState] = React.useState(FETCHING_STATES.OK);
@@ -36,11 +73,16 @@ export default (authKey, categoryIds) => {
         const fetchedItems = await fetchAll(
           `${RAYDIANT_APP_LS_RETAIL_BASE_URL}/items?auth_key=${authKey}&category_ids=${categoryIdsParam}`
         );
-        if (fetchedItems) {
+        const fetchedMatrices = await fetchAll(
+          `${RAYDIANT_APP_LS_RETAIL_BASE_URL}/matrices?auth_key=${authKey}&category_ids=${categoryIdsParam}`
+        );
+
+        if (fetchedItems && fetchedMatrices) {
+          const newItems = merge_matrix_items(fetchedItems, fetchedMatrices);
           let newItemsByCategory = {};
           // avoid infinite fetching since some category doesn't have items
           categoryIds.forEach((categoryId) => (newItemsByCategory[categoryId] = []));
-          newItemsByCategory = { ...newItemsByCategory, ...groupBy(fetchedItems, 'categoryID') };
+          newItemsByCategory = { ...newItemsByCategory, ...groupBy(newItems, 'categoryID') };
           logger.info('new itemsByCategory', newItemsByCategory);
           setItemsByCategory((itemsByCategory) => ({ ...itemsByCategory, ...newItemsByCategory }));
           setFetchingState(FETCHING_STATES.OK);
@@ -66,7 +108,7 @@ export default (authKey, categoryIds) => {
 
     setFetchingState(FETCHING_STATES.FETCHING);
     fetchItems(missingCategoryIds);
-  }, [fetchItems, missingCategoryIds, setItemsByCategory]);
+  }, [fetchItems, missingCategoryIds, setFetchingState]);
 
   React.useEffect(() => {
     const updatingInterval = setInterval(() => fetchItems(categoryIds), UPDATING_MENU_INTERVAL);

@@ -144,7 +144,7 @@ export class ItemSelection extends Selection {
     const detailDisabled = !selectedIds.includes(focusedOption.value);
     const item = { id: focusedOption.value, name: focusedOption.label };
     const detailSelection = new ItemDetailSelection(item, this.hidePrice, detailDisabled);
-    return { [this.propId]: this.prop, [detailSelection.propId]: detailSelection.prop };
+    return { [this.propId]: this.prop, ...detailSelection.getProps(values, builderState) };
   }
 }
 
@@ -168,5 +168,38 @@ export class ItemDetailSelection extends Selection {
           `auth_key={{authKey}}&hide_price=${this.hidePrice}&location_id={{locationId}}`
       )
       .disable(this.disabled);
+  }
+
+  getProps(values) {
+    const selectedDetails = this.getSelectedIds(values) || [];
+    const hideModifierPrice = this.hidePrice || !selectedDetails.includes(DETAIL_OPTIONS.PRICE);
+
+    let props = { [this.propId]: this.prop };
+    if (this.disabled) return props;
+
+    if (selectedDetails.includes(DETAIL_OPTIONS.MODIFIERS)) {
+      const modifierSelection = new ModifierSelection(this.item, hideModifierPrice);
+      props = { ...props, [modifierSelection.propId]: modifierSelection.prop };
+    }
+
+    return props;
+  }
+}
+
+export class ModifierSelection extends Selection {
+  constructor(item, hidePrice) {
+    super();
+    this.item = item;
+    this.hidePrice = hidePrice;
+  }
+
+  get propId() {
+    return `item-${this.item.id}-modifier-ids`;
+  }
+
+  get prop() {
+    return PropTypes.selection(`select ${this.item.name} modifiers`)
+      .multiple()
+      .optionsUrl(`${RAYDIANT_APP_LS_RETAIL_BASE_URL}/item/${this.item.id}/modifierOptions?auth_key={{authKey}}`);
   }
 }
