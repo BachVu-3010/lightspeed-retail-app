@@ -1,6 +1,6 @@
 {
   "name": "lightspeed-retail",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "private": true,
   "dependencies": {
     "exponential-backoff": "^3.1.0",
@@ -8,6 +8,7 @@
     "lodash.groupby": "^4.6.0",
     "lodash.isequal": "^4.5.0",
     "lodash.memoize": "^4.1.2",
+    "lodash.uniq": "^4.5.0",
     "prop-types": "^15.7.2",
     "raydiant-kit": "^4.6.0",
     "raydiant-menu": "^1.0.1",

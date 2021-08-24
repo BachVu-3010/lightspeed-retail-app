@@ -1,3 +1,4 @@
+import React from 'react';
 import useDeepMemo from 'raydiant-menu/utils/useDeepMemo';
 
 import Menu from './Menu';
@@ -27,17 +28,23 @@ const getFilteringValues = ({
   ...rest
 }) => rest;
 
-export default (presentationValues) => {
-  const { authKey, locationId } = presentationValues;
+export default (presentationValues, onError) => {
+  const { authKey, locationId, shouldFilterByTags, tags } = presentationValues;
 
   const [categories, categoryFetchingState] = useFetchingCategories(authKey);
   const [location, locationFetchingState] = useFetchingLocation(authKey, locationId);
   const menu = useDeepMemo((categories) => new Menu(categories), [categories]);
 
   const filteringValues = getFilteringValues(presentationValues);
-  const categoryIds = useDeepMemo((menu, values) => menu.getActiveCategoryIds(values), [menu, filteringValues]);
-
-  const [itemsByCategory, itemFetchingState] = useFetchingCachingItems(authKey, categoryIds);
+  const { categoryIds, itemIds } = useDeepMemo((menu, values) => menu.getActiveIds(values), [menu, filteringValues]);
+  const activeTags = React.useMemo(() => (shouldFilterByTags ? tags : undefined), [shouldFilterByTags, tags]);
+  const [itemsByCategory, itemFetchingState] = useFetchingCachingItems(
+    authKey,
+    categoryIds,
+    itemIds,
+    activeTags,
+    onError
+  );
 
   const renderingCategories = useDeepMemo(
     (menu, values, itemsByCategory, location) => menu.build(values, itemsByCategory, location),
