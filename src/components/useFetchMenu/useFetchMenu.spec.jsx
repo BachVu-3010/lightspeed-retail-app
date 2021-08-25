@@ -92,8 +92,8 @@ describe('useFetchMenu', () => {
 
   const ChildComponent = () => <div />;
   const TestComponent = ({ values }) => {
-    const [rederingCategories, loading, hasError] = useFetchMenu(values);
-    return <ChildComponent rederingCategories={rederingCategories} loading={loading} hasError={hasError} />;
+    const [renderingCategories, loading, hasError] = useFetchMenu(values);
+    return <ChildComponent renderingCategories={renderingCategories} loading={loading} hasError={hasError} />;
   };
 
   it('should fetch location, categories and items to build the menu data', (done) => {
@@ -102,13 +102,13 @@ describe('useFetchMenu', () => {
     const child = wrapper.find(ChildComponent);
     child.prop('loading').should.be.true();
     child.prop('hasError').should.be.false();
-    child.prop('rederingCategories').should.eql([]);
+    child.prop('renderingCategories').should.eql([]);
 
     setImmediate(() => {
       const updatedChild = wrapper.update().find(ChildComponent);
       updatedChild.prop('loading').should.be.false();
       updatedChild.prop('hasError').should.be.false();
-      updatedChild.prop('rederingCategories').should.eql([
+      updatedChild.prop('renderingCategories').should.eql([
         {
           id: '1',
           name: 'Category 1',
@@ -169,7 +169,7 @@ describe('useFetchMenu', () => {
       const updatedChild = wrapper.update().find(ChildComponent);
       updatedChild.prop('loading').should.be.false();
       updatedChild.prop('hasError').should.be.false();
-      updatedChild.prop('rederingCategories').should.eql([
+      updatedChild.prop('renderingCategories').should.eql([
         {
           id: '1',
           name: 'Category 1',
@@ -225,7 +225,7 @@ describe('useFetchMenu', () => {
       const updatedChild = wrapper.update().find(ChildComponent);
       updatedChild.prop('loading').should.be.false();
       updatedChild.prop('hasError').should.be.false();
-      updatedChild.prop('rederingCategories').should.eql([
+      updatedChild.prop('renderingCategories').should.eql([
         {
           id: '1',
           name: 'Category 1',
@@ -304,7 +304,7 @@ describe('useFetchMenu', () => {
     ];
 
     setImmediate(() => {
-      wrapper.update().find(ChildComponent).prop('rederingCategories').should.eql(noFilteredCategories);
+      wrapper.update().find(ChildComponent).prop('renderingCategories').should.eql(noFilteredCategories);
 
       wrapper.setProps({
         values: {
@@ -316,7 +316,7 @@ describe('useFetchMenu', () => {
       });
 
       setImmediate(() => {
-        wrapper.update().find(ChildComponent).prop('rederingCategories').should.eql(noFilteredCategories);
+        wrapper.update().find(ChildComponent).prop('renderingCategories').should.eql(noFilteredCategories);
 
         setImmediate(() => {
           wrapper.setProps({
@@ -332,7 +332,7 @@ describe('useFetchMenu', () => {
           wrapper
             .update()
             .find(ChildComponent)
-            .prop('rederingCategories')
+            .prop('renderingCategories')
             .should.eql([
               {
                 id: '1',
@@ -381,7 +381,7 @@ describe('useFetchMenu', () => {
 
     setImmediate(() => {
       const updatedChild = wrapper.update().find(ChildComponent);
-      updatedChild.prop('rederingCategories').should.eql([
+      updatedChild.prop('renderingCategories').should.eql([
         {
           id: '1',
           name: 'Category 1',
@@ -441,7 +441,7 @@ describe('useFetchMenu', () => {
 
     setImmediate(() => {
       const updatedChild = wrapper.update().find(ChildComponent);
-      updatedChild.prop('rederingCategories').should.eql([
+      updatedChild.prop('renderingCategories').should.eql([
         {
           id: '1',
           name: 'Category 1',
@@ -515,7 +515,7 @@ describe('useFetchMenu', () => {
 
     setImmediate(() => {
       const updatedChild = wrapper.update().find(ChildComponent);
-      updatedChild.prop('rederingCategories').should.eql([
+      updatedChild.prop('renderingCategories').should.eql([
         {
           id: '1',
           name: 'Category 1',
@@ -566,7 +566,7 @@ describe('useFetchMenu', () => {
 
     setImmediate(() => {
       const updatedChild = wrapper.update().find(ChildComponent);
-      updatedChild.prop('rederingCategories').should.eql([
+      updatedChild.prop('renderingCategories').should.eql([
         {
           id: '1',
           name: 'Category 1',
@@ -622,13 +622,13 @@ describe('useFetchMenu', () => {
     const child = wrapper.find(ChildComponent);
     child.prop('loading').should.be.true();
     child.prop('hasError').should.be.false();
-    child.prop('rederingCategories').should.eql([]);
+    child.prop('renderingCategories').should.eql([]);
 
     setImmediate(() => {
       const updatedChild = wrapper.update().find(ChildComponent);
       updatedChild.prop('loading').should.be.false();
       updatedChild.prop('hasError').should.be.false();
-      updatedChild.prop('rederingCategories').should.eql([
+      updatedChild.prop('renderingCategories').should.eql([
         {
           id: '1',
           name: 'Category 1',
@@ -698,7 +698,7 @@ describe('useFetchMenu', () => {
       const updatedChild = wrapper.update().find(ChildComponent);
       updatedChild.prop('loading').should.be.false();
       updatedChild.prop('hasError').should.be.false();
-      updatedChild.prop('rederingCategories').should.eql([
+      updatedChild.prop('renderingCategories').should.eql([
         {
           id: '1',
           name: 'Category 1',
@@ -739,13 +739,13 @@ describe('useFetchMenu', () => {
     const child = wrapper.find(ChildComponent);
     child.prop('loading').should.be.true();
     child.prop('hasError').should.be.false();
-    child.prop('rederingCategories').should.eql([]);
+    child.prop('renderingCategories').should.eql([]);
 
     setImmediate(() => {
       const updatedChild = wrapper.update().find(ChildComponent);
       updatedChild.prop('loading').should.be.false();
       updatedChild.prop('hasError').should.be.true();
-      updatedChild.prop('rederingCategories').should.eql([]);
+      updatedChild.prop('renderingCategories').should.eql([]);
 
       fetchMock.calls('begin:/TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/location').should.have.length(1);
       fetchMock.calls('begin:/TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categories').should.have.length(1);
@@ -838,7 +838,7 @@ describe('useFetchMenu', () => {
         const child = wrapper.update().find(ChildComponent);
         child.prop('loading').should.be.false();
         child.prop('hasError').should.be.false();
-        child.prop('rederingCategories').should.eql([
+        child.prop('renderingCategories').should.eql([
           {
             id: '1',
             name: 'Category 1',
@@ -915,7 +915,7 @@ describe('useFetchMenu', () => {
       );
       setImmediate(() => {
         const child = wrapper.update().find(ChildComponent);
-        child.prop('rederingCategories').should.eql([
+        child.prop('renderingCategories').should.eql([
           {
             id: '1',
             name: 'Category 1',
@@ -987,7 +987,7 @@ describe('useFetchMenu', () => {
         const child = wrapper.update().find(ChildComponent);
         child.prop('loading').should.be.false();
         child.prop('hasError').should.be.false();
-        child.prop('rederingCategories').should.eql([
+        child.prop('renderingCategories').should.eql([
           {
             id: '1',
             name: 'Category 1',
@@ -1046,7 +1046,7 @@ describe('useFetchMenu', () => {
 
       setImmediate(() => {
         const child = wrapper.update().find(ChildComponent);
-        child.prop('rederingCategories').should.eql([
+        child.prop('renderingCategories').should.eql([
           {
             id: '1',
             name: 'Category 1',
@@ -1110,7 +1110,7 @@ describe('useFetchMenu', () => {
         const child = wrapper.update().find(ChildComponent);
         child.prop('loading').should.be.false();
         child.prop('hasError').should.be.false();
-        child.prop('rederingCategories').should.eql([
+        child.prop('renderingCategories').should.eql([
           {
             id: '1',
             name: 'Category 1',
@@ -1175,7 +1175,7 @@ describe('useFetchMenu', () => {
         const child = wrapper.update().find(ChildComponent);
         child.prop('loading').should.be.false();
         child.prop('hasError').should.be.false();
-        child.prop('rederingCategories').should.eql([
+        child.prop('renderingCategories').should.eql([
           {
             id: '1',
             name: 'Category 1',
@@ -1256,7 +1256,7 @@ describe('useFetchMenu', () => {
         const child = wrapper.update().find(ChildComponent);
         child.prop('loading').should.be.false();
         child.prop('hasError').should.be.false();
-        child.prop('rederingCategories').should.eql([
+        child.prop('renderingCategories').should.eql([
           {
             id: '1',
             name: 'Category 1',
