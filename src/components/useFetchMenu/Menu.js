@@ -1,7 +1,9 @@
 import groupBy from 'lodash.groupby';
 import memoize from 'lodash.memoize';
+import uniq from 'lodash.uniq';
 
 import { DEFAULT_CATEGORY_DETAILS, DEFAULT_ITEM_DETAILS, DETAIL_OPTIONS, OUT_OF_STOCK_OPTIONS } from '../../constants';
+import { isEmpty, isNullish } from '../../utils';
 import {
   CategorySelection,
   CategoryDetailSelection,
@@ -9,9 +11,6 @@ import {
   ItemDetailSelection,
   ModifierSelection,
 } from '../../utils/selections';
-
-const flatMap = (arr, func) => [].concat.apply([], arr.map(func));
-const isEmpty = (arr) => !arr || !arr.length;
 
 export const itemPricing = memoize(
   (price) => (priceFormatter) => {
@@ -83,28 +82,31 @@ class Item {
       formattedItem.name = this.item.description; // in LS Retail, item's decription is item's name
     }
 
+    // hide price if needed
     const shouldHidePrice = hidePrice || !details.includes(DETAIL_OPTIONS.PRICE);
     if (!shouldHidePrice) {
       formattedItem.pricing = this.getPricing(location);
     }
 
-    const variants = this.getSelectedVariants(values);
-    if (details.includes(DETAIL_OPTIONS.MODIFIERS)) {
-      formattedItem.variants = variants
-        .map((v) => new Item(v).build(values, location, shouldHidePrice))
-        .filter((item) => item);
-    }
-
     // filter by tags
     const { shouldFilterByTags, tags } = values;
     const itemTags = this.item.tags || [];
-    if (shouldFilterByTags && tags && isEmpty(formattedItem.variants)) {
+    const isMatrixItem = this.item.itemID.startsWith('matrix-');
+    if (shouldFilterByTags && tags && !isMatrixItem) {
       const tagMatched = itemTags.length && itemTags.some((tag) => tags.includes(tag));
       if (!tagMatched) return undefined;
     }
 
-    // remove matrix if its vairants is all filtered by stock count or tags
-    if (!isEmpty(variants) && isEmpty(formattedItem.variants)) {
+    // build modifiers for matrix
+    const selectedVariants = this.getSelectedVariants(values);
+    if (details.includes(DETAIL_OPTIONS.MODIFIERS)) {
+      formattedItem.variants = selectedVariants
+        .map((v) => new Item(v).build(values, location, shouldHidePrice))
+        .filter((item) => item);
+    }
+
+    // remove matrix if its selected variants is all filtered by stock count or tags
+    if (!isEmpty(selectedVariants) && isEmpty(formattedItem.variants)) {
       return undefined;
     }
 
@@ -147,14 +149,25 @@ class CategoryNode {
     return this.subcategories.filter((categoryNode) => selectedSubcategoryIds.includes(categoryNode.id));
   }
 
-  getActiveCategoryIds(values) {
-    const selectedDetails = this.getDetails(values);
-    if (!selectedDetails.includes(DETAIL_OPTIONS.SUBCATEGORIES)) return [this.id];
+  getActiveIds(values) {
+    const activeIds = { categoryIds: [], itemIds: [] };
 
-    return [
-      this.id,
-      ...flatMap(this.getSubCategories(values), (categoryNode) => categoryNode.getActiveCategoryIds(values)),
-    ];
+    if (this.getDetails(values).includes(DETAIL_OPTIONS.ITEMS)) {
+      const selectedItemIds = this.itemSelection.getSelectedIds(values);
+      if (isNullish(selectedItemIds)) {
+        activeIds.categoryIds = [this.id];
+      } else {
+        activeIds.itemIds = selectedItemIds;
+      }
+    }
+
+    this.getSubCategories(values).forEach((categoryNode) => {
+      const { categoryIds: subCategoryIds, itemIds: subItemIds } = categoryNode.getActiveIds(values);
+      activeIds.categoryIds.push(...subCategoryIds);
+      activeIds.itemIds.push(...subItemIds);
+    });
+
+    return activeIds;
   }
 
   getSelectedItems(values, items) {
@@ -208,8 +221,16 @@ export default class Menu {
     return this.categoryNodes.filter((categoryNode) => selectedCategoryIds.includes(categoryNode.id));
   }
 
-  getActiveCategoryIds(values) {
-    return flatMap(this.getCategories(values), (categoryNode) => categoryNode.getActiveCategoryIds(values)).sort();
+  getActiveIds(values) {
+    const activeIds = { categoryIds: [], itemIds: [] };
+
+    this.getCategories(values).forEach((categoryNode) => {
+      const { categoryIds: subCategoryIds, itemIds: subItemIds } = categoryNode.getActiveIds(values);
+      activeIds.categoryIds.push(...subCategoryIds);
+      activeIds.itemIds.push(...subItemIds);
+    });
+
+    return { categoryIds: uniq(activeIds.categoryIds.sort()), itemIds: uniq(activeIds.itemIds.sort()) };
   }
 
   build(values, itemsByCategory, location) {

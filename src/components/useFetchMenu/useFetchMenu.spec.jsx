@@ -36,54 +36,55 @@ describe('useFetchMenu', () => {
       { categoryID: '5', name: 'Category 1.1.1', parentID: '3' },
       { categoryID: '6', name: 'Category 6', parentID: '0' },
     ]);
-    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&offset=0', {
-      items: [
-        {
-          itemID: '1',
-          description: 'Item 1',
-          categoryID: '1',
-          prices: createPrices(1),
-          itemShops: createItemShops('1', 1),
-        },
-        {
-          itemID: '2',
-          description: 'Item 2',
-          categoryID: '1',
-          prices: createPrices(2),
-          itemShops: createItemShops('1', 0),
-          tags: ['tag1', 'tag2', 'tag3'],
-        },
-        {
-          itemID: '3',
-          description: 'Item 3',
-          categoryID: '3',
-          prices: createPrices(3),
-          itemShops: createItemShops('1', 12),
-          tags: ['tag4'],
-        },
-        {
-          itemID: '4',
-          description: 'Item 4',
-          categoryID: '3',
-          prices: createPrices(4),
-          itemShops: createItemShops('1', 0),
-          tags: ['tag3'],
-        },
-        {
-          itemID: '5',
-          description: 'Item 5',
-          categoryID: '5',
-          prices: createPrices(5),
-          itemShops: createItemShops('1', 13),
-          tags: ['tag5'],
-        },
-      ],
-      pagination: { count: '5', offset: '0', limit: '100' },
-    });
-    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=1,2,3,4,5&offset=0', {
-      items: [],
-      pagination: { count: '0', offset: '0', limit: '100' },
-    });
+    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&item_ids=', [
+      {
+        itemID: '1',
+        description: 'Item 1',
+        categoryID: '1',
+        prices: createPrices(1),
+        itemShops: createItemShops('1', 1),
+      },
+      {
+        itemID: '2',
+        description: 'Item 2',
+        categoryID: '1',
+        prices: createPrices(2),
+        itemShops: createItemShops('1', 0),
+        tags: ['tag1', 'tag2', 'tag3'],
+      },
+      {
+        itemID: '3',
+        description: 'Item 3',
+        categoryID: '3',
+        prices: createPrices(3),
+        itemShops: createItemShops('1', 12),
+        tags: ['tag4'],
+      },
+      {
+        itemID: '4',
+        description: 'Item 4',
+        categoryID: '3',
+        prices: createPrices(4),
+        itemShops: createItemShops('1', 0),
+        tags: ['tag3'],
+      },
+      {
+        itemID: '5',
+        description: 'Item 5',
+        categoryID: '5',
+        prices: createPrices(5),
+        itemShops: createItemShops('1', 13),
+        tags: ['tag5'],
+      },
+    ]);
+    fetchMock.mock(
+      'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/itemsCount?auth_key=auth-key&category_ids=1,2,3,4,5&item_ids=',
+      { count: 5 }
+    );
+    fetchMock.mock(
+      'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=1,2,3,4,5&item_ids=',
+      []
+    );
   });
 
   afterEach(() => {
@@ -105,51 +106,53 @@ describe('useFetchMenu', () => {
     child.prop('renderingCategories').should.eql([]);
 
     setImmediate(() => {
-      const updatedChild = wrapper.update().find(ChildComponent);
-      updatedChild.prop('loading').should.be.false();
-      updatedChild.prop('hasError').should.be.false();
-      updatedChild.prop('renderingCategories').should.eql([
-        {
-          id: '1',
-          name: 'Category 1',
-          items: [
-            { id: '1', name: 'Item 1', pricing: itemPricing('1') },
-            { id: '2', name: 'Item 2', pricing: itemPricing('2') },
-          ],
-          subgroups: [
-            {
-              id: '3',
-              name: 'Category 1.1',
-              items: [
-                { id: '3', name: 'Item 3', pricing: itemPricing('3') },
-                { id: '4', name: 'Item 4', pricing: itemPricing('4') },
-              ],
-              subgroups: [
-                {
-                  id: '5',
-                  name: 'Category 1.1.1',
-                  items: [{ id: '5', name: 'Item 5', pricing: itemPricing('5') }],
-                  subgroups: [],
-                },
-              ],
-            },
-            {
-              id: '4',
-              name: 'Category 1.2',
-              items: [],
-              subgroups: [],
-            },
-          ],
-        },
-        { id: '2', name: 'Category 2', items: [], subgroups: [] },
-      ]);
+      setImmediate(() => {
+        const updatedChild = wrapper.update().find(ChildComponent);
+        updatedChild.prop('loading').should.be.false();
+        updatedChild.prop('hasError').should.be.false();
+        updatedChild.prop('renderingCategories').should.eql([
+          {
+            id: '1',
+            name: 'Category 1',
+            items: [
+              { id: '1', name: 'Item 1', pricing: itemPricing('1') },
+              { id: '2', name: 'Item 2', pricing: itemPricing('2') },
+            ],
+            subgroups: [
+              {
+                id: '3',
+                name: 'Category 1.1',
+                items: [
+                  { id: '3', name: 'Item 3', pricing: itemPricing('3') },
+                  { id: '4', name: 'Item 4', pricing: itemPricing('4') },
+                ],
+                subgroups: [
+                  {
+                    id: '5',
+                    name: 'Category 1.1.1',
+                    items: [{ id: '5', name: 'Item 5', pricing: itemPricing('5') }],
+                    subgroups: [],
+                  },
+                ],
+              },
+              {
+                id: '4',
+                name: 'Category 1.2',
+                items: [],
+                subgroups: [],
+              },
+            ],
+          },
+          { id: '2', name: 'Category 2', items: [], subgroups: [] },
+        ]);
 
-      fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/location/1?auth_key=auth-key').should.have.length(1);
-      fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categories?auth_key=auth-key').should.have.length(1);
-      fetchMock
-        .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&offset=0')
-        .should.have.length(1);
-      done();
+        fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/location/1?auth_key=auth-key').should.have.length(1);
+        fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categories?auth_key=auth-key').should.have.length(1);
+        fetchMock
+          .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&item_ids=')
+          .should.have.length(1);
+        done();
+      });
     });
   });
 
@@ -260,6 +263,40 @@ describe('useFetchMenu', () => {
   });
 
   it('should be able to filter items by tags', (done) => {
+    fetchMock.mock(
+      'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&item_ids=&tags=tag3,tag4',
+      [
+        {
+          itemID: '2',
+          description: 'Item 2',
+          categoryID: '1',
+          prices: createPrices(2),
+          itemShops: createItemShops('1', 0),
+          tags: ['tag1', 'tag2', 'tag3'],
+        },
+        {
+          itemID: '3',
+          description: 'Item 3',
+          categoryID: '3',
+          prices: createPrices(3),
+          itemShops: createItemShops('1', 12),
+          tags: ['tag4'],
+        },
+        {
+          itemID: '4',
+          description: 'Item 4',
+          categoryID: '3',
+          prices: createPrices(4),
+          itemShops: createItemShops('1', 0),
+          tags: ['tag3'],
+        },
+      ]
+    );
+    fetchMock.mock(
+      'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/itemsCount?auth_key=auth-key&category_ids=1,2,3,4,5&item_ids=&tags=tag3,tag4',
+      { count: 3 }
+    );
+
     const wrapper = mount(
       <TestComponent
         values={{
@@ -312,11 +349,18 @@ describe('useFetchMenu', () => {
           locationId: '1',
           categoryIds: ['1', '2'],
           shouldFilterByTags: true,
+          tags: undefined,
         },
       });
 
       setImmediate(() => {
         wrapper.update().find(ChildComponent).prop('renderingCategories').should.eql(noFilteredCategories);
+
+        fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/location/1?auth_key=auth-key').should.have.length(1);
+        fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categories?auth_key=auth-key').should.have.length(1);
+        fetchMock
+          .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&item_ids=')
+          .should.have.length(1);
 
         setImmediate(() => {
           wrapper.setProps({
@@ -329,37 +373,46 @@ describe('useFetchMenu', () => {
             },
           });
 
-          wrapper
-            .update()
-            .find(ChildComponent)
-            .prop('renderingCategories')
-            .should.eql([
-              {
-                id: '1',
-                name: 'Category 1',
-                items: [{ id: '2', name: 'Item 2', pricing: itemPricing('2') }],
-                subgroups: [
-                  {
-                    id: '3',
-                    name: 'Category 1.1',
-                    items: [
-                      { id: '3', name: 'Item 3', pricing: itemPricing('3') },
-                      { id: '4', name: 'Item 4', pricing: itemPricing('4') },
-                    ],
-                    subgroups: [{ id: '5', name: 'Category 1.1.1', items: [], subgroups: [] }],
-                  },
-                  { id: '4', name: 'Category 1.2', items: [], subgroups: [] },
-                ],
-              },
-              { id: '2', name: 'Category 2', items: [], subgroups: [] },
-            ]);
+          setImmediate(() => {
+            wrapper
+              .update()
+              .find(ChildComponent)
+              .prop('renderingCategories')
+              .should.eql([
+                {
+                  id: '1',
+                  name: 'Category 1',
+                  items: [{ id: '2', name: 'Item 2', pricing: itemPricing('2') }],
+                  subgroups: [
+                    {
+                      id: '3',
+                      name: 'Category 1.1',
+                      items: [
+                        { id: '3', name: 'Item 3', pricing: itemPricing('3') },
+                        { id: '4', name: 'Item 4', pricing: itemPricing('4') },
+                      ],
+                      subgroups: [{ id: '5', name: 'Category 1.1.1', items: [], subgroups: [] }],
+                    },
+                    { id: '4', name: 'Category 1.2', items: [], subgroups: [] },
+                  ],
+                },
+                { id: '2', name: 'Category 2', items: [], subgroups: [] },
+              ]);
 
-          fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/location/1?auth_key=auth-key').should.have.length(1);
-          fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categories?auth_key=auth-key').should.have.length(1);
-          fetchMock
-            .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&offset=0')
-            .should.have.length(1);
-          done();
+            fetchMock
+              .calls(
+                'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key' +
+                  '&category_ids=1,2,3,4,5&item_ids=&tags=tag3,tag4'
+              )
+              .should.have.length(1);
+            fetchMock
+              .calls(
+                'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/itemsCount?auth_key=auth-key' +
+                  '&category_ids=1,2,3,4,5&item_ids=&tags=tag3,tag4'
+              )
+              .should.have.length(1);
+            done();
+          });
         });
       });
     });
@@ -419,7 +472,7 @@ describe('useFetchMenu', () => {
       fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/location/1?auth_key=auth-key').should.have.length(1);
       fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categories?auth_key=auth-key').should.have.length(1);
       fetchMock
-        .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&offset=0')
+        .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&item_ids=')
         .should.have.length(1);
       done();
     });
@@ -479,26 +532,26 @@ describe('useFetchMenu', () => {
       fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/location/1?auth_key=auth-key').should.have.length(1);
       fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categories?auth_key=auth-key').should.have.length(1);
       fetchMock
-        .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&offset=0')
+        .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&item_ids=')
         .should.have.length(1);
       done();
     });
   });
 
   it('should be able to hide sub categories', (done) => {
-    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4&offset=0', {
-      items: [
-        { itemID: '1', description: 'Item 1', categoryID: '1', prices: createPrices(1) },
-        { itemID: '2', description: 'Item 2', categoryID: '1', prices: createPrices(2) },
-        { itemID: '3', description: 'Item 3', categoryID: '3', prices: createPrices(3) },
-        { itemID: '4', description: 'Item 4', categoryID: '3', prices: createPrices(4) },
-      ],
-      pagination: { count: '5', offset: '0', limit: '100' },
+    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4&item_ids=', [
+      { itemID: '1', description: 'Item 1', categoryID: '1', prices: createPrices(1) },
+      { itemID: '2', description: 'Item 2', categoryID: '1', prices: createPrices(2) },
+      { itemID: '3', description: 'Item 3', categoryID: '3', prices: createPrices(3) },
+      { itemID: '4', description: 'Item 4', categoryID: '3', prices: createPrices(4) },
+    ]);
+    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/itemsCount?auth_key=auth-key&category_ids=1,2,3,4&item_ids=', {
+      count: 4,
     });
-    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=1,2,3,4&offset=0', {
-      items: [],
-      pagination: { count: '0', offset: '0', limit: '100' },
-    });
+    fetchMock.mock(
+      'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=1,2,3,4&item_ids=',
+      []
+    );
 
     const wrapper = mount(
       <TestComponent
@@ -546,12 +599,34 @@ describe('useFetchMenu', () => {
       fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/location/1?auth_key=auth-key').should.have.length(1);
       fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categories?auth_key=auth-key').should.have.length(1);
       fetchMock
-        .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4&offset=0')
+        .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4&item_ids=')
         .should.have.length(1);
     });
   });
 
   it('should be able to hide items', (done) => {
+    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,4&item_ids=', [
+      {
+        itemID: '1',
+        description: 'Item 1',
+        categoryID: '1',
+        prices: createPrices(1),
+        itemShops: createItemShops('1', 1),
+      },
+      {
+        itemID: '2',
+        description: 'Item 2',
+        categoryID: '1',
+        prices: createPrices(2),
+        itemShops: createItemShops('1', 0),
+        tags: ['tag1', 'tag2', 'tag3'],
+      },
+    ]);
+    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/itemsCount?auth_key=auth-key&category_ids=1,2,4&item_ids=', {
+      count: 2,
+    });
+    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=1,2,4&item_ids=', []);
+
     const wrapper = mount(
       <TestComponent
         values={{
@@ -600,13 +675,42 @@ describe('useFetchMenu', () => {
       fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/location/1?auth_key=auth-key').should.have.length(1);
       fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categories?auth_key=auth-key').should.have.length(1);
       fetchMock
-        .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&offset=0')
+        .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,4&item_ids=')
+        .should.have.length(1);
+      fetchMock
+        .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/itemsCount?auth_key=auth-key&category_ids=1,2,4&item_ids=')
+        .should.have.length(1);
+      fetchMock
+        .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=1,2,4&item_ids=')
         .should.have.length(1);
       done();
     });
   });
 
   it('should be able to deselect some items', (done) => {
+    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=2,4&item_ids=2,3', [
+      {
+        itemID: '2',
+        description: 'Item 2',
+        categoryID: '1',
+        prices: createPrices(2),
+        itemShops: createItemShops('1', 0),
+        tags: ['tag1', 'tag2', 'tag3'],
+      },
+      {
+        itemID: '3',
+        description: 'Item 3',
+        categoryID: '3',
+        prices: createPrices(3),
+        itemShops: createItemShops('1', 12),
+        tags: ['tag4'],
+      },
+    ]);
+    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/itemsCount?auth_key=auth-key&category_ids=2,4&item_ids=2,3', {
+      count: 2,
+    });
+    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=2,4&item_ids=2,3', []);
+
     const wrapper = mount(
       <TestComponent
         values={{
@@ -661,26 +765,26 @@ describe('useFetchMenu', () => {
       fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/location/1?auth_key=auth-key').should.have.length(1);
       fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categories?auth_key=auth-key').should.have.length(1);
       fetchMock
-        .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&offset=0')
+        .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=2,4&item_ids=2,3')
+        .should.have.length(1);
+      fetchMock
+        .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=2,4&item_ids=2,3')
         .should.have.length(1);
       done();
     });
   });
 
   it('should be able to deselect some categories', (done) => {
-    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,3&offset=0', {
-      items: [
-        { itemID: '1', description: 'Item 1', categoryID: '1', prices: createPrices(1) },
-        { itemID: '2', description: 'Item 2', categoryID: '1', prices: createPrices(2) },
-        { itemID: '3', description: 'Item 3', categoryID: '3', prices: createPrices(3) },
-        { itemID: '4', description: 'Item 4', categoryID: '3', prices: createPrices(4) },
-      ],
-      pagination: { count: '5', offset: '0', limit: '100' },
+    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,3&item_ids=', [
+      { itemID: '1', description: 'Item 1', categoryID: '1', prices: createPrices(1) },
+      { itemID: '2', description: 'Item 2', categoryID: '1', prices: createPrices(2) },
+      { itemID: '3', description: 'Item 3', categoryID: '3', prices: createPrices(3) },
+      { itemID: '4', description: 'Item 4', categoryID: '3', prices: createPrices(4) },
+    ]);
+    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/itemsCount?auth_key=auth-key&category_ids=1,3&item_ids=', {
+      count: 4,
     });
-    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=1,3&offset=0', {
-      items: [],
-      pagination: { count: '0', offset: '0', limit: '100' },
-    });
+    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=1,3&item_ids=', []);
 
     const wrapper = mount(
       <TestComponent
@@ -723,7 +827,10 @@ describe('useFetchMenu', () => {
       fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/location/1?auth_key=auth-key').should.have.length(1);
       fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categories?auth_key=auth-key').should.have.length(1);
       fetchMock
-        .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,3&offset=0')
+        .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,3&item_ids=')
+        .should.have.length(1);
+      fetchMock
+        .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=1,3&item_ids=')
         .should.have.length(1);
       done();
     });
@@ -754,78 +861,179 @@ describe('useFetchMenu', () => {
     });
   });
 
+  it('should fetch enough items', (done) => {
+    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=5&item_ids=1,3,4', [
+      {
+        itemID: '1',
+        description: 'Item 1',
+        categoryID: '1',
+        prices: createPrices(1),
+        itemShops: createItemShops('1', 1),
+      },
+      {
+        itemID: '3',
+        description: 'Item 3',
+        categoryID: '3',
+        prices: createPrices(3),
+        itemShops: createItemShops('1', 12),
+        tags: ['tag4'],
+      },
+      {
+        itemID: '4',
+        description: 'Item 4',
+        categoryID: '3',
+        prices: createPrices(4),
+        itemShops: createItemShops('1', 0),
+        tags: ['tag3'],
+      },
+      {
+        itemID: '5',
+        description: 'Item 5',
+        categoryID: '5',
+        prices: createPrices(5),
+        itemShops: createItemShops('1', 13),
+        tags: ['tag5'],
+      },
+    ]);
+    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/itemsCount?auth_key=auth-key&category_ids=5&item_ids=1,3,4', {
+      count: 5,
+    });
+    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=5&item_ids=1,3,4', []);
+
+    const wrapper = mount(
+      <TestComponent
+        values={{
+          authKey: 'auth-key',
+          locationId: '1',
+          categoryIds: ['1', '2'],
+          'category-1-details': ['name_detail', 'item_detail', 'subcategory_detail', 'pricing_detail'],
+          'category-1-item-ids': ['1'],
+          'category-1-subcategory-ids': ['3'],
+          'category-3-details': ['name_detail', 'item_detail', 'subcategory_detail', 'pricing_detail'],
+          'category-3-item-ids': ['3', '4'],
+          'category-3-subcategory-ids': ['5'],
+          'category-5-details': ['name_detail', 'item_detail', 'subcategory_detail', 'pricing_detail'],
+          'category-2-details': ['name_detail'],
+        }}
+      />
+    );
+
+    setImmediate(() => {
+      setImmediate(() => {
+        const updatedChild = wrapper.update().find(ChildComponent);
+        updatedChild.prop('loading').should.be.false();
+        updatedChild.prop('hasError').should.be.false();
+        updatedChild.prop('renderingCategories').should.eql([
+          {
+            id: '1',
+            name: 'Category 1',
+            items: [{ id: '1', name: 'Item 1', pricing: itemPricing('1') }],
+            subgroups: [
+              {
+                id: '3',
+                name: 'Category 1.1',
+                items: [
+                  { id: '3', name: 'Item 3', pricing: itemPricing('3') },
+                  { id: '4', name: 'Item 4', pricing: itemPricing('4') },
+                ],
+                subgroups: [
+                  {
+                    id: '5',
+                    name: 'Category 1.1.1',
+                    items: [{ id: '5', name: 'Item 5', pricing: itemPricing('5') }],
+                    subgroups: [],
+                  },
+                ],
+              },
+            ],
+          },
+          { id: '2', name: 'Category 2' },
+        ]);
+
+        fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/location/1?auth_key=auth-key').should.have.length(1);
+        fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categories?auth_key=auth-key').should.have.length(1);
+        fetchMock
+          .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=5&item_ids=1,3,4')
+          .should.have.length(1);
+        fetchMock
+          .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/itemsCount?auth_key=auth-key&category_ids=5&item_ids=1,3,4')
+          .should.have.length(1);
+        done();
+      });
+    });
+  });
+
   describe('matrix', () => {
     beforeEach(() => {
       fetchMock.mock(
-        'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&offset=0',
-        {
-          items: [
-            {
-              itemID: '1',
-              description: 'Item 1',
-              categoryID: '1',
-              itemMatrixID: '0',
-              prices: createPrices(1),
-              itemShops: createItemShops('1', 1),
-            },
-            {
-              itemID: '2',
-              description: 'T-shirt Size S',
-              categoryID: '1',
-              itemMatrixID: '1',
-              prices: createPrices(2),
-              itemShops: createItemShops('1', 0),
-              tags: ['tag1', 'tag2'],
-            },
-            {
-              itemID: '3',
-              description: 'Item 3',
-              categoryID: '3',
-              prices: createPrices(3),
-              itemShops: createItemShops('1', 12),
-              tags: ['tag4'],
-            },
-            {
-              itemID: '4',
-              description: 'T-shirt Size S Color Blue',
-              categoryID: '1',
-              itemMatrixID: '1',
-              prices: createPrices(3),
-              itemShops: createItemShops('1', 10),
-              tags: ['tag4'],
-            },
-            {
-              itemID: '5',
-              description: 'T-shirt 2 Size M',
-              categoryID: '3',
-              itemMatrixID: '2',
-              prices: createPrices(2),
-              itemShops: createItemShops('1', 0),
-              tags: ['tag1'],
-            },
-            {
-              itemID: '6',
-              description: 'T-shirt 2 Size L',
-              categoryID: '3',
-              itemMatrixID: '2',
-              prices: createPrices(2),
-              itemShops: createItemShops('1', 0),
-              tags: ['tag2'],
-            },
-          ],
-          pagination: { count: '6', offset: '0', limit: '100' },
-        },
+        'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&item_ids=',
+        [
+          {
+            itemID: '1',
+            description: 'Item 1',
+            categoryID: '1',
+            itemMatrixID: '0',
+            prices: createPrices(1),
+            itemShops: createItemShops('1', 1),
+          },
+          {
+            itemID: '2',
+            description: 'T-shirt Size S',
+            categoryID: '1',
+            itemMatrixID: '1',
+            prices: createPrices(2),
+            itemShops: createItemShops('1', 0),
+            tags: ['tag1', 'tag2'],
+          },
+          {
+            itemID: '3',
+            description: 'Item 3',
+            categoryID: '3',
+            prices: createPrices(3),
+            itemShops: createItemShops('1', 12),
+            tags: ['tag4'],
+          },
+          {
+            itemID: '4',
+            description: 'T-shirt Size S Color Blue',
+            categoryID: '1',
+            itemMatrixID: '1',
+            prices: createPrices(3),
+            itemShops: createItemShops('1', 10),
+            tags: ['tag4'],
+          },
+          {
+            itemID: '5',
+            description: 'T-shirt 2 Size M',
+            categoryID: '3',
+            itemMatrixID: '2',
+            prices: createPrices(2),
+            itemShops: createItemShops('1', 0),
+            tags: ['tag1'],
+          },
+          {
+            itemID: '6',
+            description: 'T-shirt 2 Size L',
+            categoryID: '3',
+            itemMatrixID: '2',
+            prices: createPrices(2),
+            itemShops: createItemShops('1', 0),
+            tags: ['tag2'],
+          },
+        ],
         { overwriteRoutes: true }
       );
       fetchMock.mock(
-        'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=1,2,3,4,5&offset=0',
-        {
-          items: [
-            { itemMatrixID: '1', description: 'T-shirt', categoryID: '1' },
-            { itemMatrixID: '2', description: 'T-shirt 2', categoryID: '3' },
-          ],
-          pagination: { count: '0', offset: '0', limit: '100' },
-        },
+        'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/itemsCount?auth_key=auth-key&category_ids=1,2,3,4,5&item_ids=',
+        { count: 6 },
+        { overwriteRoutes: true }
+      );
+      fetchMock.mock(
+        'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=1,2,3,4,5&item_ids=',
+        [
+          { itemMatrixID: '1', description: 'T-shirt', categoryID: '1' },
+          { itemMatrixID: '2', description: 'T-shirt 2', categoryID: '3' },
+        ],
         { overwriteRoutes: true }
       );
     });
@@ -890,14 +1098,17 @@ describe('useFetchMenu', () => {
           { id: '2', name: 'Category 2', items: [], subgroups: [] },
         ]);
 
-        fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/location/1?auth_key=auth-key').should.have.length(1);
-        fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categories?auth_key=auth-key').should.have.length(1);
-        fetchMock
-          .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&offset=0')
-          .should.have.length(1);
-        fetchMock
-          .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=1,2,3,4,5&offset=0')
-          .should.have.length(1);
+        // fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/location/1?auth_key=auth-key').should.have.length(1);
+        // fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categories?auth_key=auth-key').should.have.length(1);
+        // fetchMock
+        //   .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&item_ids=')
+        //   .should.have.length(1);
+        // fetchMock
+        //   .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/itemsCount?auth_key=auth-key&category_ids=1,2,3,4,5&item_ids=')
+        //   .should.have.length(1);
+        // fetchMock
+        //   .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=1,2,3,4,5&item_ids=')
+        //   .should.have.length(1);
         done();
       });
     });
@@ -1095,6 +1306,35 @@ describe('useFetchMenu', () => {
     });
 
     it('should filter modifiers by tags', (done) => {
+      fetchMock.mock(
+        'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&item_ids=&tags=tag3,tag4',
+        [
+          {
+            itemID: '3',
+            description: 'Item 3',
+            categoryID: '3',
+            prices: createPrices(3),
+            itemShops: createItemShops('1', 12),
+            tags: ['tag4'],
+          },
+          {
+            itemID: '4',
+            description: 'T-shirt Size S Color Blue',
+            categoryID: '1',
+            itemMatrixID: '1',
+            prices: createPrices(3),
+            itemShops: createItemShops('1', 10),
+            tags: ['tag4'],
+          },
+        ],
+        { overwriteRoutes: true }
+      );
+      fetchMock.mock(
+        'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/itemsCount?auth_key=auth-key&category_ids=1,2,3,4,5&item_ids=&tags=tag3,tag4',
+        { count: 2 },
+        { overwriteRoutes: true }
+      );
+
       const wrapper = mount(
         <TestComponent
           values={{
@@ -1150,10 +1390,16 @@ describe('useFetchMenu', () => {
         fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/location/1?auth_key=auth-key').should.have.length(1);
         fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categories?auth_key=auth-key').should.have.length(1);
         fetchMock
-          .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&offset=0')
+          .calls(
+            'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key' +
+              '&category_ids=1,2,3,4,5&item_ids=&tags=tag3,tag4'
+          )
           .should.have.length(1);
         fetchMock
-          .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=1,2,3,4,5&offset=0')
+          .calls(
+            'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/itemsCount?auth_key=auth-key' +
+              '&category_ids=1,2,3,4,5&item_ids=&tags=tag3,tag4'
+          )
           .should.have.length(1);
         done();
       });
@@ -1231,10 +1477,10 @@ describe('useFetchMenu', () => {
         fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/location/1?auth_key=auth-key').should.have.length(1);
         fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categories?auth_key=auth-key').should.have.length(1);
         fetchMock
-          .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&offset=0')
+          .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&item_ids=')
           .should.have.length(1);
         fetchMock
-          .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=1,2,3,4,5&offset=0')
+          .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=1,2,3,4,5&item_ids=')
           .should.have.length(1);
         done();
       });
@@ -1297,10 +1543,10 @@ describe('useFetchMenu', () => {
         fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/location/1?auth_key=auth-key').should.have.length(1);
         fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categories?auth_key=auth-key').should.have.length(1);
         fetchMock
-          .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&offset=0')
+          .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&item_ids=')
           .should.have.length(1);
         fetchMock
-          .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=1,2,3,4,5&offset=0')
+          .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=1,2,3,4,5&item_ids=')
           .should.have.length(1);
         done();
       });

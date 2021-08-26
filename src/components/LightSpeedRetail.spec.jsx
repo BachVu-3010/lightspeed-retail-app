@@ -33,20 +33,21 @@ describe('LightSpeedRetail', () => {
       { categoryID: '5', name: 'Category 1.1.1', parentID: '3' },
       { categoryID: '6', name: 'Category 6', parentID: '0' },
     ]);
-    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&offset=0', {
-      items: [
-        { itemID: '1', description: 'Item 1', categoryID: '1', prices: createPrices(1) },
-        { itemID: '2', description: 'Item 2', categoryID: '1', prices: createPrices(2) },
-        { itemID: '3', description: 'Item 3', categoryID: '3', prices: createPrices(3) },
-        { itemID: '4', description: 'Item 4', categoryID: '3', prices: createPrices(4) },
-        { itemID: '5', description: 'Item 5', categoryID: '5', prices: createPrices(5) },
-      ],
-      pagination: { count: '5', offset: '0', limit: '100' },
-    });
-    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=1,2,3,4,5&offset=0', {
-      items: [],
-      pagination: { count: '5', offset: '0', limit: '100' },
-    });
+    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&item_ids=', [
+      { itemID: '1', description: 'Item 1', categoryID: '1', prices: createPrices(1) },
+      { itemID: '2', description: 'Item 2', categoryID: '1', prices: createPrices(2) },
+      { itemID: '3', description: 'Item 3', categoryID: '3', prices: createPrices(3) },
+      { itemID: '4', description: 'Item 4', categoryID: '3', prices: createPrices(4) },
+      { itemID: '5', description: 'Item 5', categoryID: '5', prices: createPrices(5) },
+    ]);
+    fetchMock.mock(
+      'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/itemsCount?auth_key=auth-key&category_ids=1,2,3,4,5&item_ids=',
+      5
+    );
+    fetchMock.mock(
+      'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=1,2,3,4,5&item_ids=',
+      []
+    );
 
     fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/location/1?auth_key=invalid-auth-key', 403);
     fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categories?auth_key=invalid-auth-key', 403);
@@ -77,61 +78,63 @@ describe('LightSpeedRetail', () => {
     );
 
     setImmediate(() => {
-      const menuLayout = wrapper.update().find(MenuLayout);
-      menuLayout.prop('presentation').should.eql({
-        values: {
-          authKey: 'auth-key',
-          locationId: '1',
-          categoryIds: ['1', '2'],
-          duration: 120,
-        },
-      });
-      menuLayout.prop('onError').should.equal(onError);
-      menuLayout.prop('onReady').should.equal(onReady);
-      menuLayout.prop('isPlaying').should.be.false();
-      menuLayout.prop('isThumbnail').should.be.false();
-      menuLayout.prop('categories').should.eql([
-        {
-          id: '1',
-          name: 'Category 1',
-          items: [
-            { id: '1', name: 'Item 1', pricing: itemPricing('1') },
-            { id: '2', name: 'Item 2', pricing: itemPricing('2') },
-          ],
-          subgroups: [
-            {
-              id: '3',
-              name: 'Category 1.1',
-              items: [
-                { id: '3', name: 'Item 3', pricing: itemPricing('3') },
-                { id: '4', name: 'Item 4', pricing: itemPricing('4') },
-              ],
-              subgroups: [
-                {
-                  id: '5',
-                  name: 'Category 1.1.1',
-                  items: [{ id: '5', name: 'Item 5', pricing: itemPricing('5') }],
-                  subgroups: [],
-                },
-              ],
-            },
-            {
-              id: '4',
-              name: 'Category 1.2',
-              items: [],
-              subgroups: [],
-            },
-          ],
-        },
-        { id: '2', name: 'Category 2', items: [], subgroups: [] },
-      ]);
+      setImmediate(() => {
+        const menuLayout = wrapper.update().find(MenuLayout);
+        menuLayout.prop('presentation').should.eql({
+          values: {
+            authKey: 'auth-key',
+            locationId: '1',
+            categoryIds: ['1', '2'],
+            duration: 120,
+          },
+        });
+        menuLayout.prop('onError').should.equal(onError);
+        menuLayout.prop('onReady').should.equal(onReady);
+        menuLayout.prop('isPlaying').should.be.false();
+        menuLayout.prop('isThumbnail').should.be.false();
+        menuLayout.prop('categories').should.eql([
+          {
+            id: '1',
+            name: 'Category 1',
+            items: [
+              { id: '1', name: 'Item 1', pricing: itemPricing('1') },
+              { id: '2', name: 'Item 2', pricing: itemPricing('2') },
+            ],
+            subgroups: [
+              {
+                id: '3',
+                name: 'Category 1.1',
+                items: [
+                  { id: '3', name: 'Item 3', pricing: itemPricing('3') },
+                  { id: '4', name: 'Item 4', pricing: itemPricing('4') },
+                ],
+                subgroups: [
+                  {
+                    id: '5',
+                    name: 'Category 1.1.1',
+                    items: [{ id: '5', name: 'Item 5', pricing: itemPricing('5') }],
+                    subgroups: [],
+                  },
+                ],
+              },
+              {
+                id: '4',
+                name: 'Category 1.2',
+                items: [],
+                subgroups: [],
+              },
+            ],
+          },
+          { id: '2', name: 'Category 2', items: [], subgroups: [] },
+        ]);
 
-      fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/location/1?auth_key=auth-key').should.have.length(1);
-      fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categories?auth_key=auth-key').should.have.length(1);
-      fetchMock
-        .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&offset=0')
-        .should.have.length(1);
-      done();
+        fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/location/1?auth_key=auth-key').should.have.length(1);
+        fetchMock.calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categories?auth_key=auth-key').should.have.length(1);
+        fetchMock
+          .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2,3,4,5&item_ids=')
+          .should.have.length(1);
+        done();
+      });
     });
   });
 

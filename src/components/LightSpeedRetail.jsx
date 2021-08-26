@@ -55,8 +55,7 @@ export const LightSpeedRetail = ({
     return () => completeTimeout && clearTimeout(completeTimeout);
   }, [duration, isPlaying, onComplete]); // Add the app's variable that can restart onComplete here
 
-  // const [categories, loading, hasError] = [[], false, false];
-  const [categories, loading, hasError] = useFetchMenu(presentation.values);
+  const [categories, loading, hasError] = useFetchMenu(presentation.values, onError);
 
   useFireError(onError, authKey, locationId, categories, hasError);
 
