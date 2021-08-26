@@ -37,6 +37,8 @@ describe('getProperties', () => {
         constraints: {},
         options: [],
         optionsUrl: 'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/locationOptions?auth_key={{authKey}}',
+        helperText: "What's This?",
+        helperLink: 'https://support.raydiant.com/hc/en-us/articles/4403847724820',
         hide: true,
       });
     });
@@ -296,7 +298,7 @@ describe('getProperties', () => {
         optional: true,
         constraints: { min: 5 },
         default: 120,
-        helperText: 'time in seconds.',
+        helperText: 'Time in seconds.',
       });
     });
   });
