@@ -18,6 +18,7 @@ Description for lightspeed-retail
 | `category-[categoryId]-subcategory-ids` | `selection`         | Selected sub category IDs to be displayed                                        |
 | `category-[categoryId]-item-ids`        | `selection`         | Selected category's item IDs to be displayed                                     |
 | `item-[itemId]-details`                 | `selection`         | Selected item details to be displayed                                            |
+| `item-[itemId]-modifier-ids`            | `selection`         | Selected item's modifiers (matrix items) to be displayed                         |
 | `shouldFilterByTags`                    | `boolean`           | Whether or not filter content by tags. Default is false                          |
 | `tags`                                  | `selection`         | Display items which include these tags.                                          |
 | `outOfStockAction`                      | `toggleButtonGroup` | Action on out of stock items; `LEAVE_IT` (default), `REMOVE`, or `STRIKETHROUGH` |

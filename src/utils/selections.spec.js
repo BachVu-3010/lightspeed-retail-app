@@ -49,12 +49,18 @@ describe('CategorySelection', () => {
     const values = {
       categoryIds: ['1', '2'],
       'category-2-details': ['name_detail', 'item_detail', 'subcategory_detail', 'pricing_detail'],
+      'category-2-item-ids': ['1', 'matrix-1'],
+      'item-matrix-1-details': ['name_detail', 'price_detail', 'modifier_detail'],
     };
     const builderState = {
       inputs: [
         {
           path: ['categoryIds'],
           state: { selectedOption: { label: 'Category 2', value: '2' } },
+        },
+        {
+          path: ['category-2-item-ids'],
+          state: { selectedOption: { label: 'T-shirt', value: 'matrix-1' } },
         },
       ],
     };
@@ -114,6 +120,27 @@ describe('CategorySelection', () => {
         constraints: {},
         options: [],
         optionsUrl: 'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/itemOptions?auth_key={{authKey}}&category_id=2',
+      },
+      'item-matrix-1-details': {
+        label: 'select T-shirt details',
+        type: 'selection',
+        optional: true,
+        multiple: true,
+        constraints: {},
+        options: [],
+        optionsUrl:
+          'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/item/matrix-1/detailOptions?' +
+          'auth_key={{authKey}}&hide_price=false&location_id={{locationId}}',
+        disable: false,
+      },
+      'item-matrix-1-modifier-ids': {
+        label: 'select T-shirt modifiers',
+        type: 'selection',
+        optional: true,
+        multiple: true,
+        constraints: {},
+        options: [],
+        optionsUrl: 'TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/item/matrix-1/modifierOptions?auth_key={{authKey}}',
       },
     });
   });

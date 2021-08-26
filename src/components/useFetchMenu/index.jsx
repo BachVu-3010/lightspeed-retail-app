@@ -39,12 +39,12 @@ export default (presentationValues) => {
 
   const [itemsByCategory, itemFetchingState] = useFetchingCachingItems(authKey, categoryIds);
 
-  const rederingCategories = useDeepMemo(
+  const renderingCategories = useDeepMemo(
     (menu, values, itemsByCategory, location) => menu.build(values, itemsByCategory, location),
     [menu, filteringValues, itemsByCategory, location]
   );
   const fetchingStates = [categoryFetchingState, locationFetchingState, itemFetchingState];
   const loading = fetchingStates.some((state) => state === FETCHING_STATES.FETCHING);
   const hasError = fetchingStates.some((state) => state === FETCHING_STATES.ERROR);
-  return [rederingCategories, loading, hasError];
+  return [renderingCategories, loading, hasError];
 };

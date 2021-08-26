@@ -10,13 +10,24 @@ import useFetchingCachingItems from './useFetchingCachingItems';
 describe('useFetchingCachingItems', () => {
   setupRetryingRequestWithoutDelay();
 
+  beforeEach(() => {
+    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=1,2&offset=0', {
+      items: [],
+      pagination: { count: '0', offset: '0', limit: '100' },
+    });
+    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=3&offset=0', {
+      items: [],
+      pagination: { count: '0', offset: '0', limit: '100' },
+    });
+  });
+
   const ChildComponent = () => <div />;
   const TestComponent = ({ authkey, categoryIds }) => {
     const [itemsByCategory, fetchingState] = useFetchingCachingItems(authkey, categoryIds);
     return <ChildComponent itemsByCategory={itemsByCategory} fetchingState={fetchingState} />;
   };
 
-  it('should fetch and return categories with fetching status', (done) => {
+  it('should fetch and return items with fetching status', (done) => {
     fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2&offset=0', {
       items: [
         { itemID: '1', description: 'Item 1', categoryID: '1', itemMatrixID: '0', Prices: [] },
@@ -39,6 +50,64 @@ describe('useFetchingCachingItems', () => {
       });
       fetchMock
         .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=1,2&offset=0')
+        .should.have.length(1);
+      fetchMock.restore();
+      done();
+    });
+  });
+
+  it('should fetch matrix and merge matrix items', (done) => {
+    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/items?auth_key=auth-key&category_ids=10,20&offset=0', {
+      items: [
+        { itemID: '1', description: 'Item 1', categoryID: '10', itemMatrixID: '0', Prices: [] },
+        { itemID: '2', description: 'T-shirt Size S', categoryID: '20', itemMatrixID: '1', Prices: [] },
+        { itemID: '3', description: 'Item 3', categoryID: '30', itemMatrixID: '0', Prices: [] },
+        { itemID: '4', description: 'T-shirt 2 Size L', categoryID: '10', itemMatrixID: '2', Prices: [] },
+        { itemID: '5', description: 'T-shirt Size L Color blue', categoryID: '20', itemMatrixID: '1', Prices: [] },
+        { itemID: '6', description: 'T-shirt 2 Size M', categoryID: '10', itemMatrixID: '2', Prices: [] },
+      ],
+      pagination: { count: '6', offset: '0', limit: '100' },
+    });
+    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=10,20&offset=0', {
+      items: [
+        { itemMatrixID: '1', description: 'T-shirt', categoryID: '20' },
+        { itemMatrixID: '2', description: 'T-shirt 2', categoryID: '10' },
+      ],
+      pagination: { count: '2', offset: '0', limit: '100' },
+    });
+
+    const wrapper = mount(<TestComponent authkey='auth-key' categoryIds={['10', '20']} />);
+    setImmediate(() => {
+      const { itemsByCategory, fetchingState } = wrapper.update().find(ChildComponent).props();
+      fetchingState.should.equal(FETCHING_STATES.OK);
+      itemsByCategory.should.eql({
+        10: [
+          { itemID: '1', description: 'Item 1', categoryID: '10', itemMatrixID: '0', Prices: [] },
+          {
+            itemID: 'matrix-2',
+            description: 'T-shirt 2',
+            categoryID: '10',
+            variants: [
+              { itemID: '4', description: 'Size L', categoryID: '10', itemMatrixID: '2', Prices: [] },
+              { itemID: '6', description: 'Size M', categoryID: '10', itemMatrixID: '2', Prices: [] },
+            ],
+          },
+        ],
+        20: [
+          {
+            itemID: 'matrix-1',
+            description: 'T-shirt',
+            categoryID: '20',
+            variants: [
+              { itemID: '2', description: 'Size S', categoryID: '20', itemMatrixID: '1', Prices: [] },
+              { itemID: '5', description: 'Size L Color blue', categoryID: '20', itemMatrixID: '1', Prices: [] },
+            ],
+          },
+        ],
+        30: [{ itemID: '3', description: 'Item 3', categoryID: '30', itemMatrixID: '0', Prices: [] }],
+      });
+      fetchMock
+        .calls('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=10,20&offset=0')
         .should.have.length(1);
       fetchMock.restore();
       done();

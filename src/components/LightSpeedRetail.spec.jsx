@@ -43,6 +43,10 @@ describe('LightSpeedRetail', () => {
       ],
       pagination: { count: '5', offset: '0', limit: '100' },
     });
+    fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/matrices?auth_key=auth-key&category_ids=1,2,3,4,5&offset=0', {
+      items: [],
+      pagination: { count: '5', offset: '0', limit: '100' },
+    });
 
     fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/location/1?auth_key=invalid-auth-key', 403);
     fetchMock.mock('TEST_RAYDIANT_APP_LS_RETAIL_BASE_URL/categories?auth_key=invalid-auth-key', 403);
