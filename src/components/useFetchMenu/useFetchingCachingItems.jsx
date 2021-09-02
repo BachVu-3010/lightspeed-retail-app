@@ -97,7 +97,9 @@ const useCheckItemsCount = (authKey, categoryIds, itemIds, tags, onError) => {
   const ok = okCache[cacheId];
   React.useEffect(() => {
     if (ok === false) {
-      onError(new Error('Too many items, please limit number of items by unselect some categories.'));
+      onError(
+        new Error('Too many items, please limit the number of items by unselecting some categories or sub-categories.')
+      );
     }
   }, [ok, onError]);
 
