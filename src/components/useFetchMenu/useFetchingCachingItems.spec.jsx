@@ -364,7 +364,9 @@ describe('useFetchingCachingItems', () => {
         onError.should.be.calledOnce();
         onError
           .getCalls()[0]
-          .args[0].message.should.equal('Too many items, please limit number of items by unselect some categories.');
+          .args[0].message.should.equal(
+            'Too many items, please limit the number of items by unselecting some categories or sub-categories.'
+          );
 
         const { itemsByCategory } = wrapper.update().find(ChildComponent).props();
         itemsByCategory.should.eql({});
