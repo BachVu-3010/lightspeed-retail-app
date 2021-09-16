@@ -11227,10 +11227,10 @@ raydiant-kit@^4.5.2, raydiant-kit@^4.6.0:
     react "^16.8.0"
     react-dom "^16.8.0"
 
-raydiant-menu@^1.1.3:
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/raydiant-menu/-/raydiant-menu-1.1.3.tgz#d0acb63060e05a0f25da4e456e9ca42652f9ffd9"
-  integrity sha512-6sYAjQOq2pCiWVZpglqu6oNhh9Zss2U6sVWT3e8VanDOmfsGGOOD3g67/Dz516VwwuNWJQIZrIo+crH2ujqqMg==
+raydiant-menu@^1.1.4:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/raydiant-menu/-/raydiant-menu-1.1.4.tgz#8f2be0f510cfe47b97779ee3ed17156e36bbc66e"
+  integrity sha512-+VV/hkanozBYNQoBYRtMGED4POH0d9LqgxLUkP/7yQmQz5LyMOEdb+pNJcvduYgeNndVnWkS4/Uz5unjvjSOcw==
   dependencies:
     "@emotion/react" "^11.4.0"
     "@emotion/styled" "^11.3.0"
